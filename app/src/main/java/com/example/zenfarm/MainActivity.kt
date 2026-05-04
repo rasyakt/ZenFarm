@@ -1,4 +1,4 @@
-package com.example.farmflow
+package com.example.zenfarm
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -9,17 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.farmflow.ui.navigation.AppNavigation
-import com.example.farmflow.ui.theme.FarmFlowTheme
-import com.example.farmflow.viewmodel.AuthViewModel
-import com.example.farmflow.viewmodel.FarmViewModel
+import com.example.zenfarm.ui.navigation.AppNavigation
+import com.example.zenfarm.ui.theme.ZenFarmTheme
+import com.example.zenfarm.viewmodel.AuthViewModel
+import com.example.zenfarm.viewmodel.FarmViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            FarmFlowTheme {
+            ZenFarmTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val authViewModel: AuthViewModel = viewModel()
                     val farmViewModel: FarmViewModel = viewModel()

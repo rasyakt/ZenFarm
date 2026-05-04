@@ -1,4 +1,4 @@
-package com.example.farmflow.ui.screens
+package com.example.zenfarm.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.farmflow.R
-import com.example.farmflow.ui.theme.*
-import com.example.farmflow.data.Hewan
-import com.example.farmflow.viewmodel.AuthViewModel
-import com.example.farmflow.viewmodel.FarmViewModel
+import com.example.zenfarm.R
+import com.example.zenfarm.ui.theme.*
+import com.example.zenfarm.data.Hewan
+import com.example.zenfarm.viewmodel.AuthViewModel
+import com.example.zenfarm.viewmodel.FarmViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -230,7 +230,7 @@ fun ProfileScreen(
                         }
                         
                         Text(
-                            text = "FarmFlow v1.0.5 - Premium Edition",
+                            text = "ZenFarm v1.0.5 - Premium Edition",
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             color = Color.Gray,

@@ -1,4 +1,4 @@
-package com.example.farmflow.ui.screens
+package com.example.zenfarm.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,9 +21,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.farmflow.R
-import com.example.farmflow.ui.theme.*
-import com.example.farmflow.viewmodel.AuthViewModel
+import com.example.zenfarm.R
+import com.example.zenfarm.ui.theme.*
+import com.example.zenfarm.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
@@ -57,8 +57,8 @@ fun LoginScreen(
             
             // ── Logo ──
             Image(
-                painter = painterResource(id = R.drawable.farmflow),
-                contentDescription = "FarmFlow Logo",
+                painter = painterResource(id = R.drawable.zenfarm),
+                contentDescription = "ZenFarm Logo",
                 modifier = Modifier.size(160.dp),
                 contentScale = ContentScale.Fit
             )
@@ -223,8 +223,8 @@ fun RegisterScreen(
             
             // ── Logo ──
             Image(
-                painter = painterResource(id = R.drawable.farmflow),
-                contentDescription = "FarmFlow Logo",
+                painter = painterResource(id = R.drawable.zenfarm),
+                contentDescription = "ZenFarm Logo",
                 modifier = Modifier.size(120.dp),
                 contentScale = ContentScale.Fit
             )
@@ -237,7 +237,7 @@ fun RegisterScreen(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Bergabung dengan FarmFlow",
+                text = "Bergabung dengan ZenFarm",
                 color = Color.White.copy(alpha = 0.8f),
                 fontSize = 14.sp
             )

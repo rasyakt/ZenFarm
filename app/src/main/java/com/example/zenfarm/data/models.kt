@@ -1,4 +1,4 @@
-package com.example.farmflow.data
+package com.example.zenfarm.data
 
 import com.google.firebase.Timestamp
 

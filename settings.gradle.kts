@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FarmFlow"
+rootProject.name = "ZenFarm"
 include(":app")

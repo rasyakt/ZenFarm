@@ -1,4 +1,4 @@
-package com.example.farmflow.ui.theme
+package com.example.zenfarm.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -47,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun FarmFlowTheme(
+fun ZenFarmTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit

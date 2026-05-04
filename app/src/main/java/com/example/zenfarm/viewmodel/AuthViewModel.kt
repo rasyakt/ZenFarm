@@ -1,9 +1,9 @@
-package com.example.farmflow.viewmodel
+package com.example.zenfarm.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.farmflow.data.FarmRepository
-import com.example.farmflow.data.User
+import com.example.zenfarm.data.FarmRepository
+import com.example.zenfarm.data.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

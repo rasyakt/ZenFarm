@@ -1,4 +1,4 @@
-package com.example.farmflow.ui.screens
+package com.example.zenfarm.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -50,11 +50,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.farmflow.data.FarmRepository
-import com.example.farmflow.data.Hewan
-import com.example.farmflow.data.User
-import com.example.farmflow.viewmodel.AuthViewModel
-import com.example.farmflow.viewmodel.FarmViewModel
+import com.example.zenfarm.data.FarmRepository
+import com.example.zenfarm.data.Hewan
+import com.example.zenfarm.data.User
+import com.example.zenfarm.viewmodel.AuthViewModel
+import com.example.zenfarm.viewmodel.FarmViewModel
 import kotlinx.coroutines.launch
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -815,7 +815,7 @@ fun HewanNode(
                     modifier = Modifier.fillMaxWidth(), 
                     enabled = isActive,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = com.example.farmflow.ui.theme.FarmGreen,
+                        containerColor = com.example.zenfarm.ui.theme.FarmGreen,
                         contentColor = Color.White
                     )
                 ) {

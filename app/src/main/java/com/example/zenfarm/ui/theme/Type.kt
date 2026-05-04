@@ -1,4 +1,4 @@
-package com.example.farmflow.ui.theme
+package com.example.zenfarm.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

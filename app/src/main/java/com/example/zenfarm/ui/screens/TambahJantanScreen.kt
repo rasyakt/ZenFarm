@@ -1,4 +1,4 @@
-package com.example.farmflow.ui.screens
+package com.example.zenfarm.ui.screens
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import com.example.farmflow.viewmodel.FarmViewModel
+import com.example.zenfarm.viewmodel.FarmViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 

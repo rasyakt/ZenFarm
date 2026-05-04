@@ -1,22 +1,22 @@
-package com.example.farmflow.ui.navigation
+package com.example.zenfarm.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.farmflow.viewmodel.AuthViewModel
-import com.example.farmflow.viewmodel.FarmViewModel
-import com.example.farmflow.ui.screens.LoginScreen
-import com.example.farmflow.ui.screens.RegisterScreen
+import com.example.zenfarm.viewmodel.AuthViewModel
+import com.example.zenfarm.viewmodel.FarmViewModel
+import com.example.zenfarm.ui.screens.LoginScreen
+import com.example.zenfarm.ui.screens.RegisterScreen
 
-import com.example.farmflow.ui.screens.PemilikDashboardScreen
-import com.example.farmflow.ui.screens.PengurusDashboardScreen
-import com.example.farmflow.ui.screens.GlobalScreen
-import com.example.farmflow.ui.screens.SilsilahCanvasScreen
-import com.example.farmflow.ui.screens.TambahAnakScreen
-import com.example.farmflow.ui.screens.WalletScreen
-import com.example.farmflow.ui.screens.ProfileScreen
+import com.example.zenfarm.ui.screens.PemilikDashboardScreen
+import com.example.zenfarm.ui.screens.PengurusDashboardScreen
+import com.example.zenfarm.ui.screens.GlobalScreen
+import com.example.zenfarm.ui.screens.SilsilahCanvasScreen
+import com.example.zenfarm.ui.screens.TambahAnakScreen
+import com.example.zenfarm.ui.screens.WalletScreen
+import com.example.zenfarm.ui.screens.ProfileScreen
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
@@ -118,7 +118,7 @@ fun AppNavigation(
         ) { backStackEntry ->
             val silsilahId = backStackEntry.arguments?.getString("silsilahId") ?: ""
             val indukBetinaId = backStackEntry.arguments?.getString("indukBetinaId") ?: ""
-            com.example.farmflow.ui.screens.TambahJantanScreen(silsilahId, indukBetinaId, farmViewModel, navController)
+            com.example.zenfarm.ui.screens.TambahJantanScreen(silsilahId, indukBetinaId, farmViewModel, navController)
         }
     }
 }

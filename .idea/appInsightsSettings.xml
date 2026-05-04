@@ -8,9 +8,9 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.farmflow" />
+                  <option name="appId" value="com.example.zenfarm" />
                   <option name="mobileSdkAppId" value="1:986494040723:android:278b9368327b2040da2b66" />
-                  <option name="projectId" value="farmflow-514fa" />
+                  <option name="projectId" value="zenfarm-514fa" />
                   <option name="projectNumber" value="986494040723" />
                 </ConnectionSetting>
               </option>

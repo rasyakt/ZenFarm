@@ -1,4 +1,4 @@
-package com.example.farmflow
+package com.example.zenfarm
 
 import org.junit.Test
 
