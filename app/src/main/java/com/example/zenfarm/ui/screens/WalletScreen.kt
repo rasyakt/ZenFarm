@@ -126,7 +126,7 @@ fun WalletScreen(
                             }
                         }
                         Spacer(modifier = Modifier.height(12.dp))
-                        Divider(color = Color.White.copy(alpha = 0.3f))
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
                         Spacer(modifier = Modifier.height(12.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -282,7 +282,7 @@ fun WalletScreen(
                                     }
                                     
                                     Spacer(modifier = Modifier.height(12.dp))
-                                    Divider(color = Color(0xFFF0F0F0))
+                                    HorizontalDivider(color = Color(0xFFF0F0F0))
                                     Spacer(modifier = Modifier.height(12.dp))
                                     
                                     // Buyer info

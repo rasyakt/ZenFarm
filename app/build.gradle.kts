@@ -54,12 +54,16 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     
     // Navigation & Compose
     implementation(libs.navigation.compose)
     
     // Coil for Images
     implementation(libs.coil.compose)
+    
+    // BCrypt for password hashing
+    implementation("org.mindrot:jbcrypt:0.4")
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 

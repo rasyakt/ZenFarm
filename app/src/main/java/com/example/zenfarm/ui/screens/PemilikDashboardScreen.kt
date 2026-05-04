@@ -655,6 +655,8 @@ fun PendingApprovalCard(
     onApprove: () -> Unit,
     onReject: () -> Unit
 ) {
+    var isProcessing by remember { mutableStateOf(false) }
+    
     val margin = penjualan.hargaJual - penjualan.hargaModal
     val marginColor = when {
         margin > 0 -> Color(0xFF4CAF50)
@@ -722,7 +724,7 @@ fun PendingApprovalCard(
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            Divider(color = Color(0xFFF0F0F0))
+            HorizontalDivider(color = Color(0xFFF0F0F0))
             Spacer(modifier = Modifier.height(12.dp))
             
             // Price details row
@@ -795,21 +797,52 @@ fun PendingApprovalCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OutlinedButton(
-                    onClick = onReject,
+                    onClick = {
+                        if (!isProcessing) {
+                            isProcessing = true
+                            onReject()
+                        }
+                    },
                     modifier = Modifier.weight(1f),
+                    enabled = !isProcessing,
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = FarmRed)
                 ) {
-                    Text("❌ Tolak", fontWeight = FontWeight.SemiBold)
+                    if (isProcessing) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = FarmRed,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("❌ Tolak", fontWeight = FontWeight.SemiBold)
+                    }
                 }
                 
                 Button(
-                    onClick = onApprove,
+                    onClick = {
+                        if (!isProcessing) {
+                            isProcessing = true
+                            onApprove()
+                        }
+                    },
                     modifier = Modifier.weight(1f),
+                    enabled = !isProcessing,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = FarmGreen)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = FarmGreen,
+                        disabledContainerColor = FarmGreen.copy(alpha = 0.5f)
+                    )
                 ) {
-                    Text("✅ Setuju", fontWeight = FontWeight.SemiBold)
+                    if (isProcessing) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("✅ Setuju", fontWeight = FontWeight.SemiBold)
+                    }
                 }
             }
         }

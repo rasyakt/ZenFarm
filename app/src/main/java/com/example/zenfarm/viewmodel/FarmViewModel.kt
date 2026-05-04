@@ -1,5 +1,6 @@
 package com.example.zenfarm.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.zenfarm.data.FarmRepository
@@ -7,6 +8,7 @@ import com.example.zenfarm.data.Hewan
 import com.example.zenfarm.data.Penjualan
 import com.example.zenfarm.data.Silsilah
 import com.example.zenfarm.data.User
+import com.example.zenfarm.utils.ImageUploader
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -314,11 +316,21 @@ class FarmViewModel : ViewModel() {
             }
 
             val parentUtama = indukBetinaId ?: ""
-            val newChildId = "temp_child_${System.currentTimeMillis()}"
-            if (isDescendant(potentialParentId = parentUtama, childId = newChildId, animals = allHewan)) {
-                onError("Invalid relationship: circular lineage detected")
-                _isLoading.value = false
-                return@launch
+            
+            // Validasi circular lineage - check if parent is descendant of any existing animal
+            if (parentUtama.isNotEmpty()) {
+                val isCircular = allHewan.any { existingAnimal ->
+                    isDescendant(
+                        potentialParentId = parentUtama,
+                        childId = existingAnimal.hewanId,
+                        animals = allHewan
+                    )
+                }
+                if (isCircular) {
+                    onError("Invalid relationship: circular lineage detected")
+                    _isLoading.value = false
+                    return@launch
+                }
             }
 
             // Find Parent (Mother) to get its level and validate
