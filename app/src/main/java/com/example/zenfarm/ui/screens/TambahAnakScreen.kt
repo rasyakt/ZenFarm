@@ -221,6 +221,7 @@ fun TambahAnakScreen(
                     }
                     
                     farmViewModel.tambahAnak(
+                        context = context,
                         silsilahId = silsilahId,
                         nama = nama,
                         jenisKelamin = jenisKelamin,

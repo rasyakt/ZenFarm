@@ -189,6 +189,7 @@ fun TambahJantanScreen(
                     }
                     
                     farmViewModel.tambahPasangan(
+                        context = context,
                         silsilahId = silsilahId,
                         indukBetinaId = indukBetinaId,
                         nama = nama,

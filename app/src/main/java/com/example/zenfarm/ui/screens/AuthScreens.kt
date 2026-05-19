@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,14 +40,15 @@ fun LoginScreen(
     val loading by viewModel.loading.collectAsState()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(FarmGreen, FarmGreenDark, Color(0xFF0D3B0F))
-                )
-            )
+        modifier = Modifier.fillMaxSize()
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.farm_bg),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.3f
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -53,65 +56,50 @@ fun LoginScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(60.dp))
             
             // ── Logo ──
             Image(
                 painter = painterResource(id = R.drawable.zenfarm),
                 contentDescription = "ZenFarm Logo",
-                modifier = Modifier.size(160.dp),
+                modifier = Modifier.size(120.dp),
                 contentScale = ContentScale.Fit
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Selamat Datang!",
-                color = Color.White,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold
+                text = "Selamat Datang",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
             )
             Text(
-                text = "Masuk ke akun Anda untuk melanjutkan",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center
+                text = "Masuk untuk melanjutkan",
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
             )
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             
-            // ── Login Card ──
+            // ── Login Form ──
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(24.dp)),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Masuk",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = FarmGreenDark
-                    )
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
                         label = { Text("Email") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
@@ -122,26 +110,22 @@ fun LoginScreen(
                         label = { Text("Password") },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     
                     if (error != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         Card(
                             colors = CardDefaults.cardColors(containerColor = FarmRedSurface),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = error!!,
                                 color = FarmRed,
                                 modifier = Modifier.padding(12.dp),
-                                fontSize = 13.sp
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -152,9 +136,9 @@ fun LoginScreen(
                         onClick = { viewModel.login(email, password, onRoleDetermined = onLoginSuccess) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp),
+                            .height(50.dp),
                         enabled = !loading && email.isNotBlank() && password.isNotBlank(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = FarmGreen,
                             disabledContainerColor = FarmGreen.copy(alpha = 0.5f)
@@ -162,12 +146,16 @@ fun LoginScreen(
                     ) {
                         if (loading) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(22.dp),
+                                modifier = Modifier.size(20.dp),
                                 color = Color.White,
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Login", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "Masuk",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
                 }
@@ -178,8 +166,8 @@ fun LoginScreen(
             TextButton(onClick = onNavigateToRegister) {
                 Text(
                     "Belum punya akun? Daftar",
-                    color = Color.White,
-                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = FarmGreen,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -204,14 +192,15 @@ fun RegisterScreen(
     val loading by viewModel.loading.collectAsState()
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(FarmGreen, FarmGreenDark, Color(0xFF0D3B0F))
-                )
-            )
+        modifier = Modifier.fillMaxSize()
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.farm_bg),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            alpha = 0.3f
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -219,64 +208,50 @@ fun RegisterScreen(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             
             // ── Logo ──
             Image(
                 painter = painterResource(id = R.drawable.zenfarm),
                 contentDescription = "ZenFarm Logo",
-                modifier = Modifier.size(120.dp),
+                modifier = Modifier.size(100.dp),
                 contentScale = ContentScale.Fit
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Buat Akun Baru",
-                color = Color.White,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
             )
             Text(
                 text = "Bergabung dengan ZenFarm",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp
+                style = MaterialTheme.typography.bodyMedium,
+                color = TextSecondary
             )
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             
-            // ── Register Card ──
+            // ── Register Form ──
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(24.dp)),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Daftar",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = FarmGreenDark
-                    )
-                    
-                    Spacer(modifier = Modifier.height(20.dp))
-                    
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
                         label = { Text("Nama Lengkap") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -285,13 +260,9 @@ fun RegisterScreen(
                         onValueChange = { email = it },
                         label = { Text("Email") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     
@@ -301,25 +272,22 @@ fun RegisterScreen(
                         label = { Text("Password") },
                         visualTransformation = PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
                     
                     // ── Role Picker ──
                     Text(
-                        "Pilih Peran:",
+                        "Pilih Peran",
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = FarmGreenDark,
+                        color = TextPrimary,
                         modifier = Modifier.align(Alignment.Start)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -331,32 +299,34 @@ fun RegisterScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = if (role == "Pemilik") FarmGreenSurface else Color(0xFFF5F5F5)
+                                containerColor = if (role == "Pemilik") FarmGreenSurface else SurfaceLight
                             ),
                             border = if (role == "Pemilik") 
-                                CardDefaults.outlinedCardBorder().copy(width = 2.dp) 
-                            else null
+                                androidx.compose.foundation.BorderStroke(2.dp, FarmGreen)
+                            else null,
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = if (role == "Pemilik") 4.dp else 0.dp
+                            )
                         ) {
                             Column(
-                                modifier = Modifier.padding(12.dp),
+                                modifier = Modifier.padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.profile_pemilik),
-                                    contentDescription = "Pemilik",
-                                    modifier = Modifier.size(48.dp)
+                                Text(
+                                    "👑",
+                                    fontSize = 32.sp
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     "Pemilik",
+                                    style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (role == "Pemilik") FarmGreen else Color.Gray,
-                                    fontSize = 14.sp
+                                    color = if (role == "Pemilik") FarmGreen else TextSecondary
                                 )
                                 Text(
                                     "Pemilik Hewan",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextHint
                                 )
                             }
                         }
@@ -367,61 +337,63 @@ fun RegisterScreen(
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = if (role == "Pengurus") FarmOrangeSurface else Color(0xFFF5F5F5)
+                                containerColor = if (role == "Pengurus") FarmOrangeSurface else SurfaceLight
                             ),
                             border = if (role == "Pengurus") 
-                                CardDefaults.outlinedCardBorder().copy(width = 2.dp) 
-                            else null
+                                androidx.compose.foundation.BorderStroke(2.dp, FarmOrange)
+                            else null,
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = if (role == "Pengurus") 4.dp else 0.dp
+                            )
                         ) {
                             Column(
-                                modifier = Modifier.padding(12.dp),
+                                modifier = Modifier.padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.profile_pengurus),
-                                    contentDescription = "Pengurus",
-                                    modifier = Modifier.size(48.dp)
+                                Text(
+                                    "⚙️",
+                                    fontSize = 32.sp
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     "Pengurus",
+                                    style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = if (role == "Pengurus") FarmOrange else Color.Gray,
-                                    fontSize = 14.sp
+                                    color = if (role == "Pengurus") FarmOrange else TextSecondary
                                 )
                                 Text(
                                     "Pengelola Ternak",
-                                    fontSize = 10.sp,
-                                    color = Color.Gray
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextHint
                                 )
                             }
                         }
                     }
                     
                     if (error != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         Card(
                             colors = CardDefaults.cardColors(containerColor = FarmRedSurface),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = error!!,
                                 color = FarmRed,
                                 modifier = Modifier.padding(12.dp),
-                                fontSize = 13.sp
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     
                     Button(
                         onClick = { viewModel.register(name, email, password, role, onSuccess = onRegisterSuccess) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp),
+                            .height(50.dp),
                         enabled = !loading && name.isNotBlank() && email.isNotBlank() && password.isNotBlank(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = FarmGreen,
                             disabledContainerColor = FarmGreen.copy(alpha = 0.5f)
@@ -429,12 +401,16 @@ fun RegisterScreen(
                     ) {
                         if (loading) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(22.dp),
+                                modifier = Modifier.size(20.dp),
                                 color = Color.White,
                                 strokeWidth = 2.dp
                             )
                         } else {
-                            Text("Register", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "Daftar",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
                 }
@@ -444,9 +420,9 @@ fun RegisterScreen(
             
             TextButton(onClick = onNavigateToLogin) {
                 Text(
-                    "Sudah punya akun? Login",
-                    color = Color.White,
-                    fontSize = 15.sp,
+                    "Sudah punya akun? Masuk",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = FarmGreen,
                     fontWeight = FontWeight.Medium
                 )
             }

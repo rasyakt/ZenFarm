@@ -125,13 +125,11 @@ fun ProfileScreen(
                                 .background(Color.White.copy(alpha = 0.3f))
                                 .padding(4.dp)
                         ) {
-                            Image(
-                                painter = painterResource(
-                                    id = if (user?.role == "Pemilik") R.drawable.profile_pemilik else R.drawable.profile_pengurus
-                                ),
+                            Icon(
+                                imageVector = Icons.Rounded.Person,
                                 contentDescription = "Profile Picture",
-                                modifier = Modifier.fillMaxSize().clip(CircleShape),
-                                contentScale = ContentScale.Fit
+                                modifier = Modifier.fillMaxSize().clip(CircleShape).padding(8.dp),
+                                tint = Color.White
                             )
                         }
 

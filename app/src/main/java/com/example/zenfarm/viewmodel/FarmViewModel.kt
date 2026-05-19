@@ -140,17 +140,30 @@ class FarmViewModel : ViewModel() {
 
     // Role: Pemilik action - Workflow Step 1, 2, 3
     fun daftarSilsilah(
+        context: Context,
         silsilahNama: String,
         hewanNama: String,
         jenisKelamin: String,
         tanggalLahirStr: String,
         ownerId: String,
         fotoUri: String,
-        onSuccess: (String) -> Unit
+        onSuccess: (String) -> Unit,
+        onError: (String) -> Unit = {}
     ) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                // Convert foto ke Base64 (disimpan di Firestore, tidak perlu Firebase Storage)
+                val uploadedImageUrl = if (fotoUri.isNotEmpty()) {
+                    android.util.Log.d("DaftarSilsilah", "Converting photo to Base64 from URI: $fotoUri")
+                    ImageUploader.uploadImage(context, fotoUri, "silsilah")
+                } else {
+                    android.util.Log.d("DaftarSilsilah", "No photo provided")
+                    ""
+                }
+                
+                android.util.Log.d("DaftarSilsilah", "Photo converted successfully (Base64 length: ${uploadedImageUrl.length})")
+                
                 val silsilahRef = repository.db.collection("silsilah").document()
                 val hewanRef = repository.db.collection("hewan").document()
                 val silsilahId = silsilahRef.id
@@ -187,7 +200,7 @@ class FarmViewModel : ViewModel() {
                         status = "HIDUP",
                         hakPembagian = "Pemilik",
                         ownershipSource = "PEMILIK",
-                        fotoUri = fotoUri,
+                        fotoUri = uploadedImageUrl, // Simpan Base64 string di Firestore
                         parentId = null, // Root parentId MUST be null
                         level = 0,       // Root level is 0
                         createdAt = Timestamp.now(),
@@ -196,10 +209,26 @@ class FarmViewModel : ViewModel() {
                     transaction.set(hewanRef, rootHewan)
                 }.await()
 
+                android.util.Log.d("DaftarSilsilah", "Silsilah created successfully: $silsilahId")
                 fetchSilsilahSaya(ownerId, "Pemilik")
                 onSuccess(silsilahId)
             } catch (e: Exception) {
+                android.util.Log.e("DaftarSilsilah", "Error: ${e.message}", e)
                 e.printStackTrace()
+                
+                // Berikan error message yang lebih spesifik
+                val errorMessage = when {
+                    e.message?.contains("memproses foto") == true -> 
+                        "Gagal memproses foto. Coba pilih foto lain atau lanjutkan tanpa foto."
+                    e.message?.contains("Network") == true -> 
+                        "Koneksi internet bermasalah. Periksa koneksi Anda."
+                    fotoUri.isNotEmpty() ->
+                        "Gagal memproses foto. Coba pilih foto lain atau lanjutkan tanpa foto."
+                    else -> 
+                        "Gagal mendaftar silsilah: ${e.message ?: "Unknown error"}"
+                }
+                
+                onError(errorMessage)
             } finally {
                 _isLoading.value = false
             }
@@ -270,6 +299,7 @@ class FarmViewModel : ViewModel() {
 
     // Rule: Add Offspring (Hybrid Hak Pembagian)
     fun tambahAnak(
+        context: Context,
         silsilahId: String,
         nama: String,
         jenisKelamin: String,
@@ -373,18 +403,32 @@ class FarmViewModel : ViewModel() {
                 }
             }
 
+            // Upload foto ke Firebase Storage
+            val uploadedImageUrl = try {
+                ImageUploader.uploadImage(context, fotoUri, "hewan")
+            } catch (e: Exception) {
+                onError("Gagal upload foto: ${e.message}")
+                _isLoading.value = false
+                return@launch
+            }
+
+            val birthTimestamp = Timestamp(
+                java.util.Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+            )
+
             val newAnak = Hewan(
                 silsilahId = silsilahId,
                 nama = nama,
                 jenisKelamin = jenisKelamin.uppercase(),
                 harga = harga,
+                tanggalLahir = birthTimestamp,
                 indukBetinaId = indukBetinaId,
                 indukJantanId = indukJantanId,
                 parentId = indukBetinaId ?: indukJantanId,
                 level = parentLevel + 1,
                 hakPembagian = hakPembagian,
                 ownershipSource = ownershipSource,
-                fotoUri = fotoUri,
+                fotoUri = uploadedImageUrl, // Simpan URL dari Firebase Storage
                 createdAt = Timestamp.now(),
                 updatedAt = Timestamp.now()
             )
@@ -403,6 +447,7 @@ class FarmViewModel : ViewModel() {
 
     // Rule: Add Partner (Father) to a Betina
     fun tambahPasangan(
+        context: Context,
         silsilahId: String,
         indukBetinaId: String,
         nama: String,
@@ -431,6 +476,19 @@ class FarmViewModel : ViewModel() {
             val oldPasangan = allHewan.find { it.hewanId == oldPasanganId }
 
             try {
+                // Upload foto jika ada (untuk jantan baru)
+                val uploadedImageUrl = if (existingJantanId == null && fotoUri.isNotEmpty()) {
+                    try {
+                        ImageUploader.uploadImage(context, fotoUri, "hewan")
+                    } catch (e: Exception) {
+                        onError("Gagal upload foto: ${e.message}")
+                        _isLoading.value = false
+                        return@launch
+                    }
+                } else {
+                    fotoUri // Existing jantan atau tidak ada foto
+                }
+
                 repository.db.runTransaction { transaction ->
                     val motherRef = repository.db.collection("hewan").document(mother.hewanId)
                     val silsilahRef = repository.db.collection("silsilah").document(silsilahId)
@@ -459,7 +517,7 @@ class FarmViewModel : ViewModel() {
                             status = status,
                             hakPembagian = hakPembagian,
                             ownershipSource = ownershipSource,
-                            fotoUri = fotoUri,
+                            fotoUri = uploadedImageUrl, // Simpan URL dari Firebase Storage
                             parentId = null, 
                             pasanganId = mother.hewanId,
                             level = mother.level,

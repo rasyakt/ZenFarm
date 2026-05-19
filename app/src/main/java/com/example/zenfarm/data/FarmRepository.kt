@@ -33,6 +33,17 @@ class FarmRepository {
             .await()
         return if (snapshot.isEmpty) null else snapshot.documents[0].toObject(User::class.java)
     }
+    
+    suspend fun updateUserPassword(userId: String, newPassword: String) {
+        val snapshot = db.collection("users")
+            .whereEqualTo("userId", userId)
+            .get()
+            .await()
+        if (!snapshot.isEmpty) {
+            val docId = snapshot.documents[0].id
+            db.collection("users").document(docId).update("password", newPassword).await()
+        }
+    }
 
     suspend fun getSilsilahById(silsilahId: String): Silsilah? {
         val snapshot = db.collection("silsilah").document(silsilahId).get().await()

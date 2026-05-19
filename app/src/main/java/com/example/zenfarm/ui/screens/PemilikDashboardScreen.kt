@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.filled.Add
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -91,32 +93,17 @@ fun PemilikDashboardScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            // ── Custom Header with Gradient ──
+            // ── Modern Header ──
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                     .background(
-                        Brush.linearGradient(
-                            colors = listOf(Color(0xFF43A047), FarmGreenDark)
+                        Brush.horizontalGradient(
+                            colors = listOf(FarmGreen, FarmGreenLight)
                         )
                     )
                     .padding(20.dp)
             ) {
-                // Decorative background circles
-                Box(
-                    modifier = Modifier
-                        .size(130.dp)
-                        .align(Alignment.TopEnd)
-                        .background(Color.White.copy(alpha = 0.07f), CircleShape)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(70.dp)
-                        .align(Alignment.BottomStart)
-                        .background(Color.White.copy(alpha = 0.07f), CircleShape)
-                )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -126,10 +113,9 @@ fun PemilikDashboardScreen(
                         // Profile Icon
                         Box(
                             modifier = Modifier
-                                .size(52.dp)
+                                .size(48.dp)
                                 .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.25f))
-                                .padding(4.dp)
+                                .background(Color.White.copy(alpha = 0.2f))
                                 .clickable {
                                     if (!isNavigating) {
                                         isNavigating = true
@@ -138,25 +124,25 @@ fun PemilikDashboardScreen(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile_pemilik),
-                                contentDescription = "Profile Pemilik",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Fit
+                            Icon(
+                                imageVector = Icons.Rounded.Person,
+                                contentDescription = "Profile",
+                                modifier = Modifier.size(24.dp),
+                                tint = Color.White
                             )
                         }
-                        Spacer(modifier = Modifier.width(14.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "Halo, ${user?.name ?: "User"}!",
+                                text = "Halo, ${user?.name ?: "User"}",
                                 color = Color.White,
-                                fontSize = 20.sp,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = "👑 Pemilik Peternakan",
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontSize = 14.sp
+                                color = Color.White.copy(alpha = 0.9f),
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -171,42 +157,40 @@ fun PemilikDashboardScreen(
                             }
                         },
                         modifier = Modifier
-                            .size(48.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.15f))
+                            .background(Color.White.copy(alpha = 0.2f))
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                             contentDescription = "Logout",
                             tint = Color.White,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
             }
 
-            // ── Quick Action Cards (2x2 Grid) ──
+            // ── Quick Action Cards ──
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Row 1: Global & Dompet — IntrinsicSize.Min agar tinggi seragam
+                // Row 1: Global & Dompet
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // ── Global Marketplace Card ──
+                    // ── Global Card ──
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight()
-                            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = FarmBlue.copy(alpha = 0.35f)),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                            .height(110.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         onClick = {
                             if (!isNavigating) {
                                 isNavigating = true
@@ -217,11 +201,6 @@ fun PemilikDashboardScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB))
-                                    )
-                                )
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -231,24 +210,28 @@ fun PemilikDashboardScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(54.dp)
+                                        .size(48.dp)
                                         .clip(CircleShape)
-                                        .background(FarmBlue.copy(alpha = 0.13f)),
+                                        .background(FarmBlueSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("🌐", fontSize = 26.sp)
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_global),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp)
+                                    )
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "GLOBAL",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = FarmBlue,
-                                    fontSize = 14.sp
+                                    "Global",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = FarmBlue
                                 )
                                 Text(
                                     "Pasar Ternak",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextSecondary
                                 )
                             }
                         }
@@ -258,10 +241,10 @@ fun PemilikDashboardScreen(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight()
-                            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = FarmOrange.copy(alpha = 0.35f)),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                            .height(110.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                         onClick = {
                             if (!isNavigating) {
                                 isNavigating = true
@@ -272,11 +255,6 @@ fun PemilikDashboardScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFFFFF8E1), Color(0xFFFFECC7))
-                                    )
-                                )
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -286,24 +264,24 @@ fun PemilikDashboardScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(54.dp)
+                                        .size(48.dp)
                                         .clip(CircleShape)
-                                        .background(FarmOrange.copy(alpha = 0.13f)),
+                                        .background(FarmOrangeSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("💰", fontSize = 26.sp)
+                                    Text("💰", fontSize = 24.sp)
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     "Dompet",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = FarmOrange,
-                                    fontSize = 14.sp
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = FarmOrange
                                 )
                                 Text(
                                     "Rp ${user?.saldo ?: 0}",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextSecondary
                                 )
                             }
                         }
@@ -312,31 +290,25 @@ fun PemilikDashboardScreen(
 
                 // Row 2: Pending & Silsilah
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     val hasPending = pendingPenjualans.isNotEmpty()
-                    val pendingAccent = if (hasPending) FarmRed else FarmGreen
-                    val pendingGradient = if (hasPending)
-                        listOf(Color(0xFFFFEBEE), Color(0xFFFFCDD2))
-                    else
-                        listOf(Color(0xFFE8F5E9), Color(0xFFC8E6C9))
+                    val pendingColor = if (hasPending) FarmRed else FarmGreen
+                    val pendingSurface = if (hasPending) FarmRedSurface else FarmGreenSurface
 
                     // ── Pending Card ──
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight()
-                            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = pendingAccent.copy(alpha = 0.35f)),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                            .height(110.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(Brush.verticalGradient(pendingGradient))
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -346,24 +318,24 @@ fun PemilikDashboardScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(54.dp)
+                                        .size(48.dp)
                                         .clip(CircleShape)
-                                        .background(pendingAccent.copy(alpha = 0.13f)),
+                                        .background(pendingSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(if (hasPending) "🔔" else "✅", fontSize = 26.sp)
+                                    Text(if (hasPending) "🔔" else "✅", fontSize = 24.sp)
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     "Pending",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = pendingAccent,
-                                    fontSize = 14.sp
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = pendingColor
                                 )
                                 Text(
                                     "${pendingPenjualans.size} Menunggu",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextSecondary
                                 )
                             }
                         }
@@ -373,19 +345,14 @@ fun PemilikDashboardScreen(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .fillMaxHeight()
-                            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = FarmGreen.copy(alpha = 0.35f)),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                            .height(110.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFFE8F5E9), Color(0xFFC8E6C9))
-                                    )
-                                )
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -395,24 +362,24 @@ fun PemilikDashboardScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(54.dp)
+                                        .size(48.dp)
                                         .clip(CircleShape)
-                                        .background(FarmGreen.copy(alpha = 0.13f)),
+                                        .background(FarmGreenSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("🌿", fontSize = 26.sp)
+                                    Text("🌿", fontSize = 24.sp)
                                 }
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     "Silsilah",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = FarmGreenDark,
-                                    fontSize = 14.sp
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = FarmGreenDark
                                 )
                                 Text(
                                     "${silsilahs.size} Total",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextSecondary
                                 )
                             }
                         }
@@ -425,15 +392,15 @@ fun PemilikDashboardScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
-                // ── PENDING APPROVAL SECTION ──
+                // ── Pending Approval Section ──
                 if (pendingPenjualans.isNotEmpty()) {
                     item {
                         Text(
-                            "🔔 Persetujuan Penjualan",
+                            "Persetujuan Penjualan",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = FarmRed,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                         )
                     }
                     items(pendingPenjualans) { penjualan ->
@@ -446,7 +413,7 @@ fun PemilikDashboardScreen(
                                         ownerId = u.userId,
                                         onSuccess = {
                                             scope.launch {
-                                                snackbarHostState.showSnackbar("Penjualan disetujui! Saldo bertambah.")
+                                                snackbarHostState.showSnackbar("Penjualan disetujui!")
                                             }
                                         },
                                         onError = { msg ->
@@ -463,19 +430,13 @@ fun PemilikDashboardScreen(
 
                 // ── Silsilah List Header ──
                 item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            "📋 Silsilah Saya",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = FarmGreenDark
-                        )
-                    }
+                    Text(
+                        "Silsilah Saya",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = FarmGreenDark,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+                    )
                 }
 
                 // ── Silsilah Content ──
@@ -502,14 +463,14 @@ fun PemilikDashboardScreen(
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 "Belum ada silsilah",
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color = Color.Gray,
-                                fontSize = 16.sp
+                                color = TextSecondary
                             )
                             Text(
                                 "Klik + untuk mendaftarkan silsilah baru",
-                                color = Color.Gray,
-                                fontSize = 13.sp
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextHint
                             )
                         }
                     }
@@ -518,16 +479,16 @@ fun PemilikDashboardScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 5.dp)
-                                .shadow(6.dp, RoundedCornerShape(16.dp), spotColor = FarmGreenDark.copy(alpha = 0.5f))
+                                .padding(horizontal = 16.dp, vertical = 6.dp)
                                 .clickable {
                                     if (!isNavigating) {
                                         isNavigating = true
                                         navController.navigate("silsilah_detail/${s.silsilahId}")
                                     }
                                 },
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = CardWhite),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Row(
                                 modifier = Modifier.padding(16.dp),
@@ -535,51 +496,57 @@ fun PemilikDashboardScreen(
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .size(52.dp)
-                                        .clip(RoundedCornerShape(14.dp))
-                                        .background(Color(0xFFF0F4F8)),
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(FarmGreenSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Image(
-                                        painter = painterResource(id = R.drawable.domba_icon_list1_01),
-                                        contentDescription = "Sheep Icon",
-                                        modifier = Modifier.fillMaxSize().padding(4.dp),
-                                        contentScale = ContentScale.Fit
+                                        painter = painterResource(id = R.drawable.ic_sheep),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp)
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.width(14.dp))
+                                Spacer(modifier = Modifier.width(12.dp))
 
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         s.namaSilsilah,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp,
                                         color = FarmGreenDark
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val statusColor = when (s.status.lowercase()) {
-                                        "aktif" -> FarmGreenLight
+                                        "aktif" -> FarmGreen
                                         "selesai" -> FarmBlue
                                         else -> FarmOrange
                                     }
                                     Card(
-                                        shape = RoundedCornerShape(8.dp),
+                                        shape = RoundedCornerShape(6.dp),
                                         colors = CardDefaults.cardColors(
                                             containerColor = statusColor.copy(alpha = 0.15f)
                                         )
                                     ) {
                                         Text(
                                             text = s.status.uppercase(),
-                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                             color = statusColor,
-                                            fontSize = 11.sp,
+                                            style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
 
-                                Text("▶", color = FarmGreen, fontSize = 18.sp)
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    tint = FarmGreen,
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .graphicsLayer(rotationZ = 180f)
+                                )
                             }
                         }
                     }
@@ -589,12 +556,17 @@ fun PemilikDashboardScreen(
 
         // ── Daftar Silsilah Dialog ──
         if (showDaftarSilsilah) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            var showRetryDialog by remember { mutableStateOf(false) }
+            var pendingData by remember { mutableStateOf<Map<String, String>?>(null) }
+            
             DaftarSilsilahDialog(
                 isLoading = isLoading,
                 onDismiss = { showDaftarSilsilah = false },
                 onConfirm = { silsilahNama, hewanNama, jenisKelamin, tanggalLahir, fotoUri ->
                     user?.let { u ->
                         farmViewModel.daftarSilsilah(
+                            context = context,
                             silsilahNama = silsilahNama,
                             hewanNama = hewanNama,
                             jenisKelamin = jenisKelamin,
@@ -610,11 +582,116 @@ fun PemilikDashboardScreen(
                                         navController.navigate("silsilah_detail/$newId")
                                     }
                                 }
+                            },
+                            onError = { msg ->
+                                scope.launch {
+                                    // Jika error terkait foto, tawarkan opsi skip foto
+                                    if (fotoUri.isNotEmpty() && (msg.contains("foto") || msg.contains("Object does not exist"))) {
+                                        pendingData = mapOf(
+                                            "silsilahNama" to silsilahNama,
+                                            "hewanNama" to hewanNama,
+                                            "jenisKelamin" to jenisKelamin,
+                                            "tanggalLahir" to tanggalLahir
+                                        )
+                                        showRetryDialog = true
+                                    } else {
+                                        snackbarHostState.showSnackbar(msg)
+                                    }
+                                }
                             }
                         )
                     }
                 }
             )
+            
+            // ── Retry Dialog (Skip Foto) ──
+            if (showRetryDialog && pendingData != null) {
+                AlertDialog(
+                    onDismissRequest = { showRetryDialog = false },
+                    shape = RoundedCornerShape(20.dp),
+                    containerColor = CardWhite,
+                    title = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("⚠️", fontSize = 24.sp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Gagal Upload Foto",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = FarmOrange
+                            )
+                        }
+                    },
+                    text = {
+                        Column {
+                            Text(
+                                "Foto tidak dapat diupload. Anda bisa:",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextPrimary
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                "• Lanjutkan tanpa foto (bisa ditambahkan nanti)",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextSecondary
+                            )
+                            Text(
+                                "• Coba lagi dengan foto lain",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = TextSecondary
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                // Lanjutkan tanpa foto
+                                user?.let { u ->
+                                    farmViewModel.daftarSilsilah(
+                                        context = context,
+                                        silsilahNama = pendingData!!["silsilahNama"]!!,
+                                        hewanNama = pendingData!!["hewanNama"]!!,
+                                        jenisKelamin = pendingData!!["jenisKelamin"]!!,
+                                        tanggalLahirStr = pendingData!!["tanggalLahir"]!!,
+                                        ownerId = u.userId,
+                                        fotoUri = "", // Skip foto
+                                        onSuccess = { newId ->
+                                            showDaftarSilsilah = false
+                                            showRetryDialog = false
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Silsilah berhasil didaftarkan tanpa foto!")
+                                                if (!isNavigating) {
+                                                    isNavigating = true
+                                                    navController.navigate("silsilah_detail/$newId")
+                                                }
+                                            }
+                                        },
+                                        onError = { msg ->
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar(msg)
+                                            }
+                                        }
+                                    )
+                                }
+                            },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = FarmGreen)
+                        ) {
+                            Text("Lanjutkan Tanpa Foto")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = { 
+                                showRetryDialog = false
+                                // Kembali ke dialog untuk pilih foto lain
+                            }
+                        ) {
+                            Text("Coba Lagi", color = FarmOrange)
+                        }
+                    }
+                )
+            }
         }
 
         // ── Reject Dialog ──
@@ -659,23 +736,23 @@ fun PendingApprovalCard(
     
     val margin = penjualan.hargaJual - penjualan.hargaModal
     val marginColor = when {
-        margin > 0 -> Color(0xFF4CAF50)
+        margin > 0 -> FarmGreen
         margin < 0 -> FarmRed
-        else -> Color.Gray
+        else -> TextSecondary
     }
     val marginText = when {
         margin > 0 -> "Untung: Rp $margin"
         margin < 0 -> "Rugi: Rp ${-margin}"
-        else -> "Tidak memiliki keuntungan"
+        else -> "Impas"
     }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp)
-            .shadow(6.dp, RoundedCornerShape(16.dp), spotColor = Color.Gray.copy(alpha = 0.5f)),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header
@@ -692,104 +769,131 @@ fun PendingApprovalCard(
                             .background(FarmOrangeSurface),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("🐄", fontSize = 20.sp)
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_cow),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             penjualan.hewanNama.ifEmpty { "Hewan #${penjualan.hewanId.take(6)}" },
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
+                            color = TextPrimary
                         )
                         Text(
                             "Diajukan oleh Pengurus",
-                            fontSize = 12.sp,
-                            color = Color.Gray
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextSecondary
                         )
                     }
                 }
                 
                 Card(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(6.dp),
                     colors = CardDefaults.cardColors(containerColor = FarmOrangeSurface)
                 ) {
                     Text(
                         "PENDING",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         color = FarmOrange,
-                        fontSize = 11.sp,
+                        style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
             
             Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = Color(0xFFF0F0F0))
+            HorizontalDivider(color = DividerGray)
             Spacer(modifier = Modifier.height(12.dp))
             
-            // Price details row
+            // Price details
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF8F9FA))
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(SurfaceLight)
                     .padding(12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Modal", fontSize = 11.sp, color = Color.Gray)
+                    Text(
+                        "Modal",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextHint
+                    )
                     Text(
                         "Rp ${penjualan.hargaModal}",
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
                         color = FarmBrown
                     )
                 }
-                Text("→", color = Color.Gray, modifier = Modifier.align(Alignment.CenterVertically))
+                Text("→", color = TextHint, modifier = Modifier.align(Alignment.CenterVertically))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Jual", fontSize = 11.sp, color = Color.Gray)
+                    Text(
+                        "Jual",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextHint
+                    )
                     Text(
                         "Rp ${penjualan.hargaJual}",
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
                         color = FarmGreen
                     )
                 }
-                Text("=", color = Color.Gray, modifier = Modifier.align(Alignment.CenterVertically))
+                Text("=", color = TextHint, modifier = Modifier.align(Alignment.CenterVertically))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Margin", fontSize = 11.sp, color = marginColor)
+                    Text(
+                        "Margin",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextHint
+                    )
                     Text(
                         marginText,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
                         color = marginColor
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             
             // Buyer info
             Row(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Pembeli", fontSize = 11.sp, color = Color.Gray)
+                    Text(
+                        "Pembeli",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextHint
+                    )
                     Text(
                         penjualan.buyerName.ifEmpty { "N/A" },
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
+                        color = TextPrimary
                     )
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Kontak", fontSize = 11.sp, color = Color.Gray)
+                    Text(
+                        "Kontak",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextHint
+                    )
                     Text(
                         penjualan.buyerPhone.ifEmpty { "N/A" },
+                        style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 14.sp
+                        color = TextPrimary
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
             // Action buttons
             Row(
@@ -803,9 +907,9 @@ fun PendingApprovalCard(
                             onReject()
                         }
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).height(44.dp),
                     enabled = !isProcessing,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = FarmRed)
                 ) {
                     if (isProcessing) {
@@ -815,7 +919,7 @@ fun PendingApprovalCard(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("❌ Tolak", fontWeight = FontWeight.SemiBold)
+                        Text("Tolak", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
                     }
                 }
                 
@@ -826,9 +930,9 @@ fun PendingApprovalCard(
                             onApprove()
                         }
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).height(44.dp),
                     enabled = !isProcessing,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(10.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = FarmGreen,
                         disabledContainerColor = FarmGreen.copy(alpha = 0.5f)
@@ -841,7 +945,7 @@ fun PendingApprovalCard(
                             strokeWidth = 2.dp
                         )
                     } else {
-                        Text("✅ Setuju", fontWeight = FontWeight.SemiBold)
+                        Text("Setuju", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -935,10 +1039,9 @@ fun RejectPenjualanDialog(
                         shape = RoundedCornerShape(14.dp),
                         singleLine = false,
                         maxLines = 3,
-                        colors = OutlinedTextFieldDefaults.colors(
+                        colors = standardTextFieldColors(
                             focusedBorderColor = FarmRed,
-                            focusedLabelColor = FarmRed,
-                            cursorColor = FarmRed
+                            unfocusedBorderColor = DividerGray
                         )
                     )
                 }
@@ -984,14 +1087,8 @@ fun DaftarSilsilahDialog(
     ) { uri ->
         if (uri != null) {
             try {
-                val inputStream = context.contentResolver.openInputStream(uri)
-                val file = java.io.File(context.filesDir, "hewan_root_${System.currentTimeMillis()}.jpg")
-                inputStream?.use { input ->
-                    file.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-                fotoUri = file.absolutePath
+                // Simpan URI langsung untuk diupload nanti
+                fotoUri = uri.toString()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -1067,11 +1164,7 @@ fun DaftarSilsilahDialog(
                         enabled = !isLoading,
                         singleLine = true,
                         shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                 } else {
                     Text(
@@ -1088,11 +1181,7 @@ fun DaftarSilsilahDialog(
                         enabled = !isLoading,
                         singleLine = true,
                         shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text("Jenis Kelamin:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
@@ -1122,11 +1211,7 @@ fun DaftarSilsilahDialog(
                         enabled = !isLoading,
                         singleLine = true,
                         shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = FarmGreen,
-                            focusedLabelColor = FarmGreen,
-                            cursorColor = FarmGreen
-                        )
+                        colors = standardTextFieldColors()
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))

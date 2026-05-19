@@ -110,11 +110,11 @@ fun PengurusDashboardScreen(
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile_pengurus),
+                            Icon(
+                                imageVector = Icons.Rounded.Person,
                                 contentDescription = "Profile Pengurus",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Fit
+                                modifier = Modifier.fillMaxSize().padding(8.dp),
+                                tint = Color.White
                             )
                         }
                         Spacer(modifier = Modifier.width(14.dp))
@@ -208,7 +208,11 @@ fun PengurusDashboardScreen(
                                         .background(FarmBlue.copy(alpha = 0.13f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("🌐", fontSize = 26.sp)
+                                    Image(
+                                        painter = painterResource(id = R.drawable.ic_global),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp)
+                                    )
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
@@ -419,10 +423,9 @@ fun PengurusDashboardScreen(
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Image(
-                                            painter = painterResource(id = R.drawable.domba_icon_list1_01),
-                                            contentDescription = "Sheep Icon",
-                                            modifier = Modifier.fillMaxSize().padding(4.dp),
-                                            contentScale = ContentScale.Fit
+                                            painter = painterResource(id = R.drawable.ic_sheep),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(32.dp)
                                         )
                                     }
                                     

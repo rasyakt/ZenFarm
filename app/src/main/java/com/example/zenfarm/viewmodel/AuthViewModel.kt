@@ -54,10 +54,35 @@ class AuthViewModel : ViewModel() {
             try {
                 val foundUser = repository.getUser(email)
                 if (foundUser != null) {
-                    // Verify password dengan BCrypt
-                    if (BCrypt.checkpw(password, foundUser.password)) {
+                    // Check if password is BCrypt hash or plain text
+                    val isPasswordValid = if (foundUser.password.startsWith("$2a$") || foundUser.password.startsWith("$2b$")) {
+                        // BCrypt hash - verify dengan BCrypt
+                        try {
+                            BCrypt.checkpw(password, foundUser.password)
+                        } catch (e: Exception) {
+                            false
+                        }
+                    } else {
+                        // Plain text - compare langsung (backward compatibility)
+                        foundUser.password == password
+                    }
+                    
+                    if (isPasswordValid) {
                         _user.value = foundUser
                         onRoleDetermined(foundUser.role)
+                        
+                        // Auto-upgrade plain text password to BCrypt
+                        if (!foundUser.password.startsWith("$2a$") && !foundUser.password.startsWith("$2b$")) {
+                            viewModelScope.launch {
+                                try {
+                                    val hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt())
+                                    repository.updateUserPassword(foundUser.userId, hashedPassword)
+                                } catch (e: Exception) {
+                                    // Silent fail - password upgrade is not critical
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
                     } else {
                         _error.value = "Email atau Password salah."
                     }
