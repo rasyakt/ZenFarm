@@ -1087,8 +1087,14 @@ fun DaftarSilsilahDialog(
     ) { uri ->
         if (uri != null) {
             try {
-                // Simpan URI langsung untuk diupload nanti
-                fotoUri = uri.toString()
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val file = java.io.File(context.filesDir, "induk_utama_${System.currentTimeMillis()}.jpg")
+                inputStream?.use { input ->
+                    file.outputStream().use { output ->
+                        input.copyTo(output)
+                    }
+                }
+                fotoUri = file.absolutePath
             } catch (e: Exception) {
                 e.printStackTrace()
             }

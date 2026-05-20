@@ -784,8 +784,19 @@ fun HewanNode(
                 contentAlignment = Alignment.Center
             ) {
                 if (hewan.fotoUri.isNotEmpty()) {
+                    val imageModel = remember(hewan.fotoUri) {
+                        if (hewan.fotoUri.startsWith("/") || hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:")) {
+                            java.io.File(hewan.fotoUri)
+                        } else {
+                            try {
+                                android.util.Base64.decode(hewan.fotoUri, android.util.Base64.DEFAULT)
+                            } catch (e: Exception) {
+                                hewan.fotoUri
+                            }
+                        }
+                    }
                     coil.compose.AsyncImage(
-                        model = java.io.File(hewan.fotoUri),
+                        model = imageModel,
                         contentDescription = "Foto ${hewan.nama}",
                         modifier = Modifier
                             .fillMaxSize()
@@ -952,8 +963,19 @@ fun AnimalDetailDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
                 if (hewan.fotoUri.isNotEmpty()) {
+                    val imageModel = remember(hewan.fotoUri) {
+                        if (hewan.fotoUri.startsWith("/") || hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:")) {
+                            java.io.File(hewan.fotoUri)
+                        } else {
+                            try {
+                                android.util.Base64.decode(hewan.fotoUri, android.util.Base64.DEFAULT)
+                            } catch (e: Exception) {
+                                hewan.fotoUri
+                            }
+                        }
+                    }
                     coil.compose.AsyncImage(
-                        model = java.io.File(hewan.fotoUri),
+                        model = imageModel,
                         contentDescription = "Foto ${hewan.nama}",
                         modifier = Modifier
                             .fillMaxWidth()
