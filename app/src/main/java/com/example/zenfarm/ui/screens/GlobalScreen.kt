@@ -62,23 +62,11 @@ fun GlobalScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(FarmBlue, Color(0xFF0D47A1))
-                        )
-                    )
+                    .shadow(4.dp)
+                    .background(FarmBlue)
                     .statusBarsPadding()
-                    .padding(bottom = 16.dp, start = 8.dp, end = 8.dp, top = 8.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                // Decorative circles
-                Box(
-                    modifier = Modifier
-                        .size(120.dp)
-                        .align(Alignment.TopEnd)
-                        .offset(x = 30.dp, y = (-50).dp)
-                        .background(Color.White.copy(alpha = 0.08f), CircleShape)
-                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -136,11 +124,7 @@ fun GlobalScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(CardWhite, FarmBlueSurface.copy(alpha = 0.4f))
-                            )
-                        )
+                        .background(CardWhite)
                         .padding(16.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {

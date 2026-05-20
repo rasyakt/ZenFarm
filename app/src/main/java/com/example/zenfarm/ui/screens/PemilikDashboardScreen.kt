@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material.icons.rounded.Pets
 import androidx.compose.material.icons.rounded.AddPhotoAlternate
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.DateRange
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -58,6 +59,7 @@ fun PemilikDashboardScreen(
     val user by authViewModel.user.collectAsState()
     val silsilahs by farmViewModel.silsilahs.collectAsState()
     val pendingPenjualans by farmViewModel.pendingPenjualans.collectAsState()
+    val userHewans by farmViewModel.userHewans.collectAsState()
     val isLoading by farmViewModel.isLoading.collectAsState()
     var isNavigating by remember { mutableStateOf(false) }
 
@@ -78,6 +80,7 @@ fun PemilikDashboardScreen(
         user?.let {
             farmViewModel.fetchSilsilahSaya(it.userId, it.role)
             farmViewModel.fetchPendingPenjualan(it.userId)
+            farmViewModel.fetchUserHewans(it.userId, it.role)
         }
     }
 
@@ -106,13 +109,10 @@ fun PemilikDashboardScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(FarmGreen, FarmGreenLight)
-                        )
-                    )
+                    .shadow(4.dp)
+                    .background(FarmGreen)
                     .statusBarsPadding()
-                    .padding(bottom = 20.dp, start = 20.dp, end = 20.dp, top = 16.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -407,11 +407,55 @@ fun PemilikDashboardScreen(
                                         .background(FarmGreenSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.ic_sheep),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(32.dp)
-                                    )
+                                    val rootHewan = userHewans.find { it.silsilahId == s.silsilahId && it.parentId == null }
+                                    val fotoUri = rootHewan?.fotoUri ?: ""
+                                    
+                                    if (fotoUri.isNotEmpty()) {
+                                        val isBase64 = !fotoUri.startsWith("content:") &&
+                                                       !fotoUri.startsWith("file:") &&
+                                                       (fotoUri.length > 500 || !fotoUri.startsWith("/"))
+                                        
+                                        if (isBase64) {
+                                            val imageBitmap = com.example.zenfarm.utils.rememberBase64Image(fotoUri)
+                                            if (imageBitmap != null) {
+                                                Image(
+                                                    bitmap = imageBitmap,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            } else {
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.ic_sheep),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(32.dp)
+                                                )
+                                            }
+                                        } else {
+                                            val imageModel = remember(fotoUri) {
+                                                when {
+                                                    fotoUri.startsWith("/") -> java.io.File(fotoUri)
+                                                    fotoUri.startsWith("content:") || fotoUri.startsWith("file:") ->
+                                                        android.net.Uri.parse(fotoUri)
+                                                    else -> fotoUri
+                                                }
+                                            }
+                                            coil.compose.AsyncImage(
+                                                model = imageModel,
+                                                contentDescription = null,
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop,
+                                                error = painterResource(id = R.drawable.ic_sheep),
+                                                placeholder = painterResource(id = R.drawable.ic_sheep)
+                                            )
+                                        }
+                                    } else {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.ic_sheep),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.width(12.dp))
@@ -470,7 +514,25 @@ fun PemilikDashboardScreen(
                 isLoading = isLoading,
                 onDismiss = { showDaftarSilsilah = false },
                 onConfirm = { silsilahNama, hewanNama, jenisKelamin, tanggalLahir, fotoUri ->
+                    android.util.Log.d("PemilikDashboard", "=== DAFTAR SILSILAH START ===")
+                    android.util.Log.d("PemilikDashboard", "onConfirm called with:")
+                    android.util.Log.d("PemilikDashboard", "  - silsilahNama: $silsilahNama")
+                    android.util.Log.d("PemilikDashboard", "  - hewanNama: $hewanNama")
+                    android.util.Log.d("PemilikDashboard", "  - jenisKelamin: $jenisKelamin")
+                    android.util.Log.d("PemilikDashboard", "  - tanggalLahir: $tanggalLahir")
+                    android.util.Log.d("PemilikDashboard", "  - fotoUri length: ${fotoUri.length}")
+                    android.util.Log.d("PemilikDashboard", "  - user: ${user?.userId}")
+                    
+                    if (user == null) {
+                        android.util.Log.e("PemilikDashboard", "ERROR: User is null!")
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Error: User tidak ditemukan")
+                        }
+                        return@DaftarSilsilahDialog
+                    }
+                    
                     user?.let { u ->
+                        android.util.Log.d("PemilikDashboard", "Calling farmViewModel.daftarSilsilah...")
                         farmViewModel.daftarSilsilah(
                             context = context,
                             silsilahNama = silsilahNama,
@@ -480,6 +542,7 @@ fun PemilikDashboardScreen(
                             ownerId = u.userId,
                             fotoUri = fotoUri,
                             onSuccess = { newId ->
+                                android.util.Log.d("PemilikDashboard", "=== SUCCESS: Silsilah created with ID: $newId ===")
                                 showDaftarSilsilah = false
                                 scope.launch {
                                     snackbarHostState.showSnackbar("Silsilah berhasil didaftarkan!")
@@ -490,6 +553,7 @@ fun PemilikDashboardScreen(
                                 }
                             },
                             onError = { msg ->
+                                android.util.Log.e("PemilikDashboard", "=== ERROR: $msg ===")
                                 scope.launch {
                                     // Jika error terkait foto, tawarkan opsi skip foto
                                     if (fotoUri.isNotEmpty() && (msg.contains("foto") || msg.contains("Object does not exist"))) {
@@ -988,76 +1052,132 @@ fun DaftarSilsilahDialog(
     var fotoUri by remember { mutableStateOf("") }
 
     val context = androidx.compose.ui.platform.LocalContext.current
+    
+    // Clear Coil cache when dialog opens to prevent showing cached images
+    LaunchedEffect(Unit) {
+        android.util.Log.d("DaftarSilsilahDialog", "Dialog opened, clearing image cache")
+        coil.ImageLoader(context).apply {
+            memoryCache?.clear()
+        }
+    }
+    
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
             try {
+                android.util.Log.d("DaftarSilsilahDialog", "Photo selected: $uri")
+                
+                // Generate unique filename with timestamp
+                val timestamp = System.currentTimeMillis()
+                val fileName = "induk_utama_$timestamp.jpg"
+                
+                // Clean up old temporary files (older than 1 hour)
+                val filesDir = context.filesDir
+                filesDir.listFiles()?.forEach { file ->
+                    if (file.name.startsWith("induk_utama_") && 
+                        (System.currentTimeMillis() - file.lastModified()) > 3600000) {
+                        android.util.Log.d("DaftarSilsilahDialog", "Deleting old temp file: ${file.name}")
+                        file.delete()
+                    }
+                }
+                
+                // Copy to internal storage for reliable access
                 val inputStream = context.contentResolver.openInputStream(uri)
-                val file = java.io.File(context.filesDir, "induk_utama_${System.currentTimeMillis()}.jpg")
+                val file = java.io.File(filesDir, fileName)
+                
                 inputStream?.use { input ->
                     file.outputStream().use { output ->
                         input.copyTo(output)
                     }
                 }
-                fotoUri = file.absolutePath
+                
+                android.util.Log.d("DaftarSilsilahDialog", "Photo copied to: ${file.absolutePath}")
+                android.util.Log.d("DaftarSilsilahDialog", "File size: ${file.length()} bytes")
+                
+                // Use proper file:// URI format so ImageUploader can parse it
+                fotoUri = android.net.Uri.fromFile(file).toString()
+                android.util.Log.d("DaftarSilsilahDialog", "Photo URI set: $fotoUri")
+                
             } catch (e: Exception) {
+                android.util.Log.e("DaftarSilsilahDialog", "Error copying photo: ${e.message}", e)
                 e.printStackTrace()
             }
+        } else {
+            android.util.Log.d("DaftarSilsilahDialog", "No photo selected (uri is null)")
         }
     }
 
     AlertDialog(
         onDismissRequest = if (isLoading) ({}) else onDismiss,
         shape = RoundedCornerShape(24.dp),
-        containerColor = Color.White,
+        containerColor = if (isLoading) Color.White.copy(alpha = 0.95f) else Color.White,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = if (step == 1) Icons.Rounded.AccountTree else Icons.Rounded.Pets,
-                    contentDescription = null,
-                    tint = FarmGreenDark,
-                    modifier = Modifier.size(28.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    if (step == 1) "Mulai Silsilah Baru" else "Data Induk Pertama",
-                    fontWeight = FontWeight.Bold,
-                    color = FarmGreenDark
-                )
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(FarmGreen.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = if (step == 1) Icons.Rounded.AccountTree else Icons.Rounded.Pets,
+                        contentDescription = null,
+                        tint = FarmGreenDark,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        if (isLoading) "Menyimpan..." else if (step == 1) "Silsilah Baru" else "Induk Pertama",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = TextPrimary
+                    )
+                    Text(
+                        if (isLoading) "Mohon tunggu..." else if (step == 1) "Langkah 1 dari 2" else "Langkah 2 dari 2",
+                        fontSize = 12.sp,
+                        color = TextSecondary
+                    )
+                }
             }
         },
         text = {
-            Column {
-                // Step indicator
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                // Modern Step indicator
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
+                    // Step 1
                     Box(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(if (step >= 1) FarmGreen else Color.LightGray),
+                            .background(FarmGreen),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("1", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("1", color = Color.White, fontWeight = FontWeight.Bold)
                     }
+                    // Divider
                     Box(
                         modifier = Modifier
-                            .width(40.dp)
-                            .height(3.dp)
-                            .align(Alignment.CenterVertically)
-                            .background(if (step >= 2) FarmGreen else Color.LightGray)
+                            .width(48.dp)
+                            .height(2.dp)
+                            .background(if (step >= 2) FarmGreen else DividerGray)
                     )
+                    // Step 2
                     Box(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(if (step >= 2) FarmGreen else Color.LightGray),
+                            .background(if (step >= 2) FarmGreen else Color(0xFFE0E0E0)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("2", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("2", color = if (step >= 2) Color.White else TextHint, fontWeight = FontWeight.Bold)
                     }
                 }
                 
@@ -1065,105 +1185,201 @@ fun DaftarSilsilahDialog(
                 
                 if (step == 1) {
                     Text(
-                        "Tentukan nama untuk silsilah/garis keturunan ini.",
-                        color = Color.Gray,
-                        fontSize = 13.sp
+                        "Tentukan nama untuk silsilah atau garis keturunan hewan ini. Nama ini akan menjadi identitas utama keturunan.",
+                        color = TextSecondary,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
                         value = namaSilsilah,
                         onValueChange = { namaSilsilah = it },
-                        label = { Text("Nama Silsilah (ex: Sapi Limosin A)") },
+                        label = { Text("Nama Silsilah") },
+                        placeholder = { Text("Contoh: Sapi Limosin Unggulan") },
+                        leadingIcon = { Icon(Icons.Rounded.AccountTree, contentDescription = null, tint = FarmGreen) },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isLoading,
                         singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = standardTextFieldColors()
                     )
                 } else {
                     Text(
-                        "Input data hewan sebagai induk utama silsilah ini.",
-                        color = Color.Gray,
-                        fontSize = 13.sp
+                        "Lengkapi data profil untuk hewan yang akan menjadi Induk Pertama pada silsilah ini.",
+                        color = TextSecondary,
+                        fontSize = 13.sp,
+                        lineHeight = 18.sp
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
                     OutlinedTextField(
                         value = namaHewan,
                         onValueChange = { namaHewan = it },
                         label = { Text("Nama Hewan Induk") },
+                        placeholder = { Text("Masukkan nama hewan") },
+                        leadingIcon = { Icon(Icons.Rounded.Pets, contentDescription = null, tint = FarmGreen) },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isLoading,
                         singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
-                        colors = standardTextFieldColors()
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text("Jenis Kelamin:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(
-                            selected = jenisKelamin == "Jantan", 
-                            onClick = { jenisKelamin = "Jantan" },
-                            enabled = !isLoading,
-                            colors = RadioButtonDefaults.colors(selectedColor = FarmGreen)
-                        )
-                        Text("Jantan")
-                        Spacer(modifier = Modifier.width(16.dp))
-                        RadioButton(
-                            selected = jenisKelamin == "Betina", 
-                            onClick = { jenisKelamin = "Betina" },
-                            enabled = !isLoading,
-                            colors = RadioButtonDefaults.colors(selectedColor = FarmGreen)
-                        )
-                        Text("Betina")
-                    }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = tanggalLahir,
-                        onValueChange = { tanggalLahir = it },
-                        label = { Text("Tgl Lahir Induk (YYYY-MM-DD)") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isLoading,
-                        singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = standardTextFieldColors()
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Button(
-                            onClick = { launcher.launch("image/*") },
-                            enabled = !isLoading,
+                    
+                    Text("Jenis Kelamin", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // Jantan
+                        Card(
+                            onClick = { if (!isLoading) jenisKelamin = "Jantan" },
+                            modifier = Modifier.weight(1f).height(48.dp),
                             shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = FarmGreen)
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (jenisKelamin == "Jantan") FarmGreen.copy(alpha = 0.15f) else SurfaceLight
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (jenisKelamin == "Jantan") FarmGreen else DividerGray
+                            )
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Rounded.AddPhotoAlternate,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Pilih Foto Induk")
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Jantan", color = if (jenisKelamin == "Jantan") FarmGreenDark else TextSecondary, fontWeight = FontWeight.Bold)
                             }
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
-                        if (fotoUri.isNotEmpty()) {
+                        // Betina
+                        Card(
+                            onClick = { if (!isLoading) jenisKelamin = "Betina" },
+                            modifier = Modifier.weight(1f).height(48.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (jenisKelamin == "Betina") FarmGreen.copy(alpha = 0.15f) else SurfaceLight
+                            ),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                if (jenisKelamin == "Betina") FarmGreen else DividerGray
+                            )
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                                Text("Betina", color = if (jenisKelamin == "Betina") FarmGreenDark else TextSecondary, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    OutlinedTextField(
+                        value = tanggalLahir,
+                        onValueChange = { tanggalLahir = it },
+                        label = { Text("Tanggal Lahir (YYYY-MM-DD)") },
+                        leadingIcon = { Icon(Icons.Rounded.DateRange, contentDescription = null, tint = FarmGreen) },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isLoading,
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = standardTextFieldColors()
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Photo picker button
+                    Card(
+                        onClick = { if (!isLoading) launcher.launch("image/*") },
+                        modifier = Modifier.fillMaxWidth().height(60.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = if (fotoUri.isNotEmpty()) FarmGreen.copy(alpha = 0.1f) else SurfaceLight),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, if (fotoUri.isNotEmpty()) FarmGreen else DividerGray)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Rounded.CheckCircle,
-                                    contentDescription = null,
-                                    tint = FarmGreen,
-                                    modifier = Modifier.size(16.dp)
+                                Box(
+                                    modifier = Modifier.size(36.dp).clip(CircleShape).background(if (fotoUri.isNotEmpty()) FarmGreen else Color(0xFFE0E0E0)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = if (fotoUri.isNotEmpty()) Icons.Rounded.CheckCircle else Icons.Rounded.AddPhotoAlternate,
+                                        contentDescription = null,
+                                        tint = if (fotoUri.isNotEmpty()) Color.White else TextSecondary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        if (fotoUri.isNotEmpty()) "Foto Induk Terpilih" else "Unggah Foto Induk",
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 14.sp,
+                                        color = if (fotoUri.isNotEmpty()) FarmGreenDark else TextPrimary
+                                    )
+                                    if (fotoUri.isNotEmpty()) {
+                                        Text("Ketuk untuk mengganti foto", fontSize = 11.sp, color = TextSecondary)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // ── Image Preview ──
+                    if (fotoUri.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceLight),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(16.dp)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                // Use unique key to prevent Coil from using cached image
+                                val imageKey = remember(fotoUri) { 
+                                    "$fotoUri?t=${System.currentTimeMillis()}" 
+                                }
+                                
+                                coil.compose.AsyncImage(
+                                    model = coil.request.ImageRequest.Builder(context)
+                                        .data(fotoUri)
+                                        .memoryCacheKey(imageKey)
+                                        .diskCacheKey(imageKey)
+                                        .build(),
+                                    contentDescription = "Preview Foto Induk",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(16.dp)),
+                                    contentScale = ContentScale.Crop
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Foto terpilih", color = FarmGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                // Label overlay
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(8.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(Color.Black.copy(alpha = 0.5f))
+                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        "Preview Foto",
+                                        color = Color.White,
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
                         }
                     }
                 }
                 
                 if (isLoading) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         color = FarmGreen
@@ -1177,28 +1393,54 @@ fun DaftarSilsilahDialog(
                     onClick = { step = 2 },
                     enabled = namaSilsilah.isNotBlank() && !isLoading,
                     shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = FarmGreen)
-                ) { Text("Lanjut ke Step 2") }
+                ) { 
+                    Text("Lanjut", fontWeight = FontWeight.Bold) 
+                }
             } else {
                 Button(
-                    onClick = { onConfirm(namaSilsilah, namaHewan, jenisKelamin, tanggalLahir, fotoUri) },
+                    onClick = { 
+                        android.util.Log.d("DaftarSilsilahDialog", "Simpan button clicked")
+                        android.util.Log.d("DaftarSilsilahDialog", "Data: nama=$namaHewan, jk=$jenisKelamin, tgl=$tanggalLahir, foto=${fotoUri.take(50)}")
+                        onConfirm(namaSilsilah, namaHewan, jenisKelamin, tanggalLahir, fotoUri) 
+                    },
                     enabled = namaHewan.isNotBlank() && tanggalLahir.isNotBlank() && !isLoading,
                     shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = FarmGreen)
-                ) { Text("Simpan & Lihat Pohon") }
+                ) { 
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text("Simpan Silsilah", fontWeight = FontWeight.Bold) 
+                }
             }
         },
         dismissButton = {
             if (step == 2) {
-                TextButton(
+                OutlinedButton(
                     onClick = { step = 1 },
-                    enabled = !isLoading
-                ) { Text("Kembali", color = FarmGreen) }
+                    enabled = !isLoading,
+                    shape = RoundedCornerShape(12.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, DividerGray),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSecondary)
+                ) { 
+                    Text("Kembali", fontWeight = FontWeight.SemiBold) 
+                }
             } else {
                 TextButton(
                     onClick = onDismiss,
-                    enabled = !isLoading
-                ) { Text("Batal", color = Color.Gray) }
+                    enabled = !isLoading,
+                    colors = ButtonDefaults.textButtonColors(contentColor = TextSecondary)
+                ) { 
+                    Text("Batal", fontWeight = FontWeight.SemiBold) 
+                }
             }
         }
     )

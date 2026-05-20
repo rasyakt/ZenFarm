@@ -49,7 +49,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
+import androidx.compose.foundation.Image
 import com.example.zenfarm.data.FarmRepository
 import com.example.zenfarm.data.Hewan
 import com.example.zenfarm.data.User
@@ -784,25 +786,53 @@ fun HewanNode(
                 contentAlignment = Alignment.Center
             ) {
                 if (hewan.fotoUri.isNotEmpty()) {
-                    val imageModel = remember(hewan.fotoUri) {
-                        if (hewan.fotoUri.startsWith("/") || hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:")) {
-                            java.io.File(hewan.fotoUri)
+                    // Check if it's a Base64 string
+                    val isBase64 = !hewan.fotoUri.startsWith("content:") && 
+                                   !hewan.fotoUri.startsWith("file:") && 
+                                   (hewan.fotoUri.length > 500 || !hewan.fotoUri.startsWith("/"))
+                    
+                    if (isBase64) {
+                        // Use custom Base64 decoder
+                        val imageBitmap = com.example.zenfarm.utils.rememberBase64Image(hewan.fotoUri)
+                        
+                        if (imageBitmap != null) {
+                            androidx.compose.foundation.Image(
+                                bitmap = imageBitmap,
+                                contentDescription = "Foto ${hewan.nama}",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
                         } else {
-                            try {
-                                android.util.Base64.decode(hewan.fotoUri, android.util.Base64.DEFAULT)
-                            } catch (e: Exception) {
-                                hewan.fotoUri
+                            // Fallback to placeholder if decode fails
+                            androidx.compose.foundation.Image(
+                                painter = painterResource(id = com.example.zenfarm.R.drawable.ic_cow),
+                                contentDescription = "Placeholder",
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                    } else {
+                        // Use Coil for file paths and URIs
+                        val imageModel = remember(hewan.fotoUri) {
+                            when {
+                                hewan.fotoUri.startsWith("/") -> java.io.File(hewan.fotoUri)
+                                hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:") -> 
+                                    android.net.Uri.parse(hewan.fotoUri)
+                                else -> hewan.fotoUri
                             }
                         }
+                        coil.compose.AsyncImage(
+                            model = imageModel,
+                            contentDescription = "Foto ${hewan.nama}",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop,
+                            error = painterResource(id = com.example.zenfarm.R.drawable.ic_cow),
+                            placeholder = painterResource(id = com.example.zenfarm.R.drawable.ic_cow)
+                        )
                     }
-                    coil.compose.AsyncImage(
-                        model = imageModel,
-                        contentDescription = "Foto ${hewan.nama}",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
                 } else {
                     Text("No Photo", color = Color.White, style = MaterialTheme.typography.bodySmall)
                 }
@@ -963,26 +993,76 @@ fun AnimalDetailDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.verticalScroll(rememberScrollState())) {
                 if (hewan.fotoUri.isNotEmpty()) {
-                    val imageModel = remember(hewan.fotoUri) {
-                        if (hewan.fotoUri.startsWith("/") || hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:")) {
-                            java.io.File(hewan.fotoUri)
+                    // Check if it's a Base64 string
+                    val isBase64 = !hewan.fotoUri.startsWith("content:") && 
+                                   !hewan.fotoUri.startsWith("file:") && 
+                                   (hewan.fotoUri.length > 500 || !hewan.fotoUri.startsWith("/"))
+                    
+                    android.util.Log.d("AnimalDetailDialog", "=== IMAGE DISPLAY ===")
+                    android.util.Log.d("AnimalDetailDialog", "Hewan: ${hewan.nama}")
+                    android.util.Log.d("AnimalDetailDialog", "fotoUri length: ${hewan.fotoUri.length}")
+                    android.util.Log.d("AnimalDetailDialog", "isBase64: $isBase64")
+                    android.util.Log.d("AnimalDetailDialog", "First 100 chars: ${hewan.fotoUri.take(100)}")
+                    
+                    if (isBase64) {
+                        android.util.Log.d("AnimalDetailDialog", "Using Base64 decoder")
+                        // Use custom Base64 decoder
+                        val imageBitmap = com.example.zenfarm.utils.rememberBase64Image(hewan.fotoUri)
+                        
+                        if (imageBitmap != null) {
+                            android.util.Log.d("AnimalDetailDialog", "✅ Image decoded successfully")
+                            androidx.compose.foundation.Image(
+                                bitmap = imageBitmap,
+                                contentDescription = "Foto ${hewan.nama}",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.LightGray),
+                                contentScale = ContentScale.Crop
+                            )
                         } else {
-                            try {
-                                android.util.Base64.decode(hewan.fotoUri, android.util.Base64.DEFAULT)
-                            } catch (e: Exception) {
-                                hewan.fotoUri
+                            android.util.Log.e("AnimalDetailDialog", "❌ Image decode failed - showing placeholder")
+                            // Fallback to placeholder if decode fails
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color.LightGray),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                androidx.compose.foundation.Image(
+                                    painter = painterResource(id = com.example.zenfarm.R.drawable.ic_cow),
+                                    contentDescription = "Placeholder",
+                                    modifier = Modifier.size(64.dp)
+                                )
                             }
                         }
+                    } else {
+                        android.util.Log.d("AnimalDetailDialog", "Using Coil for file/URI")
+                        // Use Coil for file paths and URIs
+                        val imageModel = remember(hewan.fotoUri) {
+                            when {
+                                hewan.fotoUri.startsWith("/") -> java.io.File(hewan.fotoUri)
+                                hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:") -> 
+                                    android.net.Uri.parse(hewan.fotoUri)
+                                else -> hewan.fotoUri
+                            }
+                        }
+                        coil.compose.AsyncImage(
+                            model = imageModel,
+                            contentDescription = "Foto ${hewan.nama}",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.LightGray),
+                            contentScale = ContentScale.Crop,
+                            error = painterResource(id = com.example.zenfarm.R.drawable.ic_cow),
+                            placeholder = painterResource(id = com.example.zenfarm.R.drawable.ic_cow)
+                        )
                     }
-                    coil.compose.AsyncImage(
-                        model = imageModel,
-                        contentDescription = "Foto ${hewan.nama}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.LightGray)
-                    )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
 

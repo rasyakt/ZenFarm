@@ -40,6 +40,7 @@ fun PengurusDashboardScreen(
 ) {
     val user by authViewModel.user.collectAsState()
     val silsilahs by farmViewModel.silsilahs.collectAsState()
+    val userHewans by farmViewModel.userHewans.collectAsState()
     val isLoading by farmViewModel.isLoading.collectAsState()
     var isNavigating by remember { mutableStateOf(false) }
 
@@ -52,6 +53,7 @@ fun PengurusDashboardScreen(
     LaunchedEffect(user) {
         user?.let {
             farmViewModel.fetchSilsilahSaya(it.userId, it.role)
+            farmViewModel.fetchUserHewans(it.userId, it.role)
         }
     }
 
@@ -64,29 +66,11 @@ fun PengurusDashboardScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(Color(0xFFFFB300), Color(0xFFBF360C))
-                        )
-                    )
+                    .shadow(4.dp)
+                    .background(FarmOrange)
                     .statusBarsPadding()
-                    .padding(bottom = 20.dp, start = 20.dp, end = 20.dp, top = 16.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                // Decorative background circles
-                Box(
-                    modifier = Modifier
-                        .size(130.dp)
-                        .align(Alignment.TopEnd)
-                        .background(Color.White.copy(alpha = 0.07f), CircleShape)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(70.dp)
-                        .align(Alignment.BottomStart)
-                        .background(Color.White.copy(alpha = 0.07f), CircleShape)
-                )
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -96,7 +80,7 @@ fun PengurusDashboardScreen(
                         // Profile Icon
                         Box(
                             modifier = Modifier
-                                .size(52.dp)
+                                .size(48.dp)
                                 .clip(CircleShape)
                                 .background(Color.White.copy(alpha = 0.25f))
                                 .padding(4.dp)
@@ -162,11 +146,7 @@ fun PengurusDashboardScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(Color(0xFFE8F5E9), Color(0xFFC8E6C9))
-                                )
-                            )
+                            .background(FarmGreenSurface)
                             .padding(horizontal = 20.dp, vertical = 16.dp)
                     ) {
                         Row(
@@ -315,11 +295,55 @@ fun PengurusDashboardScreen(
                                             .background(Color(0xFFF0F4F8)),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.ic_sheep),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(32.dp)
-                                        )
+                                        val rootHewan = userHewans.find { it.silsilahId == s.silsilahId && it.parentId == null }
+                                        val fotoUri = rootHewan?.fotoUri ?: ""
+                                        
+                                        if (fotoUri.isNotEmpty()) {
+                                            val isBase64 = !fotoUri.startsWith("content:") &&
+                                                           !fotoUri.startsWith("file:") &&
+                                                           (fotoUri.length > 500 || !fotoUri.startsWith("/"))
+                                            
+                                            if (isBase64) {
+                                                val imageBitmap = com.example.zenfarm.utils.rememberBase64Image(fotoUri)
+                                                if (imageBitmap != null) {
+                                                    Image(
+                                                        bitmap = imageBitmap,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.fillMaxSize(),
+                                                        contentScale = ContentScale.Crop
+                                                    )
+                                                } else {
+                                                    Image(
+                                                        painter = painterResource(id = R.drawable.ic_sheep),
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(32.dp)
+                                                    )
+                                                }
+                                            } else {
+                                                val imageModel = remember(fotoUri) {
+                                                    when {
+                                                        fotoUri.startsWith("/") -> java.io.File(fotoUri)
+                                                        fotoUri.startsWith("content:") || fotoUri.startsWith("file:") ->
+                                                            android.net.Uri.parse(fotoUri)
+                                                        else -> fotoUri
+                                                    }
+                                                }
+                                                coil.compose.AsyncImage(
+                                                    model = imageModel,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    contentScale = ContentScale.Crop,
+                                                    error = painterResource(id = R.drawable.ic_sheep),
+                                                    placeholder = painterResource(id = R.drawable.ic_sheep)
+                                                )
+                                            }
+                                        } else {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.ic_sheep),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(32.dp)
+                                            )
+                                        }
                                     }
                                     
                                     Spacer(modifier = Modifier.width(14.dp))

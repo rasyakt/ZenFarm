@@ -69,14 +69,10 @@ fun WalletScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(FarmGreen, FarmGreenDark)
-                        )
-                    )
+                    .shadow(4.dp)
+                    .background(FarmGreen)
                     .statusBarsPadding()
-                    .padding(bottom = 16.dp, start = 8.dp, end = 8.dp, top = 8.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -129,13 +125,7 @@ fun WalletScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(
-                                    Brush.linearGradient(
-                                        colors = listOf(
-                                            Color(0xFFFF8F00),
-                                            FarmOrange,
-                                            Color(0xFFFDD835)
-                                        )
-                                    ),
+                                    color = FarmOrange,
                                     shape = RoundedCornerShape(24.dp)
                                 )
                                 .padding(24.dp)

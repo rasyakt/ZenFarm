@@ -150,35 +150,64 @@ class FarmViewModel : ViewModel() {
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit = {}
     ) {
+        android.util.Log.d("FarmViewModel", "========================================")
+        android.util.Log.d("FarmViewModel", "daftarSilsilah CALLED")
+        android.util.Log.d("FarmViewModel", "  silsilahNama: $silsilahNama")
+        android.util.Log.d("FarmViewModel", "  hewanNama: $hewanNama")
+        android.util.Log.d("FarmViewModel", "  jenisKelamin: $jenisKelamin")
+        android.util.Log.d("FarmViewModel", "  tanggalLahir: $tanggalLahirStr")
+        android.util.Log.d("FarmViewModel", "  ownerId: $ownerId")
+        android.util.Log.d("FarmViewModel", "  fotoUri: ${fotoUri.take(100)}...")
+        android.util.Log.d("FarmViewModel", "========================================")
+        
         viewModelScope.launch {
-            _isLoading.value = true
             try {
+                android.util.Log.d("FarmViewModel", "Step 1: Setting isLoading = true")
+                _isLoading.value = true
+                
+                android.util.Log.d("FarmViewModel", "Step 2: Processing photo...")
                 // Convert foto ke Base64 (disimpan di Firestore, tidak perlu Firebase Storage)
                 val uploadedImageUrl = if (fotoUri.isNotEmpty()) {
                     android.util.Log.d("DaftarSilsilah", "Converting photo to Base64 from URI: $fotoUri")
-                    ImageUploader.uploadImage(context, fotoUri, "silsilah")
+                    try {
+                        val result = ImageUploader.uploadImage(context, fotoUri, "silsilah")
+                        android.util.Log.d("DaftarSilsilah", "Photo conversion SUCCESS (length: ${result.length})")
+                        result
+                    } catch (e: Exception) {
+                        android.util.Log.e("DaftarSilsilah", "Photo conversion FAILED: ${e.message}", e)
+                        throw e
+                    }
                 } else {
-                    android.util.Log.d("DaftarSilsilah", "No photo provided")
+                    android.util.Log.d("DaftarSilsilah", "No photo provided, skipping...")
                     ""
                 }
                 
-                android.util.Log.d("DaftarSilsilah", "Photo converted successfully (Base64 length: ${uploadedImageUrl.length})")
-                
+                android.util.Log.d("FarmViewModel", "Step 3: Creating Firestore references...")
                 val silsilahRef = repository.db.collection("silsilah").document()
                 val hewanRef = repository.db.collection("hewan").document()
                 val silsilahId = silsilahRef.id
+                android.util.Log.d("FarmViewModel", "  silsilahId: $silsilahId")
+                android.util.Log.d("FarmViewModel", "  hewanId: ${hewanRef.id}")
 
+                android.util.Log.d("FarmViewModel", "Step 4: Parsing date...")
                 val parsedDate = try {
-                    LocalDate.parse(tanggalLahirStr)
+                    val date = LocalDate.parse(tanggalLahirStr)
+                    android.util.Log.d("FarmViewModel", "  Date parsed: $date")
+                    date
                 } catch (e: Exception) {
+                    android.util.Log.e("FarmViewModel", "  Date parse failed, using today: ${e.message}")
                     LocalDate.now()
                 }
                 
                 val birthTimestamp = Timestamp(
                     java.util.Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
                 )
+                android.util.Log.d("FarmViewModel", "  Timestamp: $birthTimestamp")
 
+                android.util.Log.d("FarmViewModel", "Step 5: Starting Firestore transaction...")
                 repository.db.runTransaction { transaction ->
+                    android.util.Log.d("FarmViewModel", "  Transaction started")
+                    
                     // 1. Create Silsilah
                     val masterSilsilah = Silsilah(
                         silsilahId = silsilahId,
@@ -188,7 +217,9 @@ class FarmViewModel : ViewModel() {
                         createdAt = Timestamp.now(),
                         updatedAt = Timestamp.now()
                     )
+                    android.util.Log.d("FarmViewModel", "  Creating Silsilah: $masterSilsilah")
                     transaction.set(silsilahRef, masterSilsilah)
+                    android.util.Log.d("FarmViewModel", "  Silsilah set in transaction")
 
                     // 2. Create Root Animal (induk pertama)
                     val rootHewan = Hewan(
@@ -206,31 +237,49 @@ class FarmViewModel : ViewModel() {
                         createdAt = Timestamp.now(),
                         updatedAt = Timestamp.now()
                     )
+                    android.util.Log.d("FarmViewModel", "  Creating Hewan: nama=${rootHewan.nama}, jk=${rootHewan.jenisKelamin}")
                     transaction.set(hewanRef, rootHewan)
+                    android.util.Log.d("FarmViewModel", "  Hewan set in transaction")
+                    
+                    android.util.Log.d("FarmViewModel", "  Transaction prepared, returning...")
                 }.await()
 
-                android.util.Log.d("DaftarSilsilah", "Silsilah created successfully: $silsilahId")
+                android.util.Log.d("FarmViewModel", "Step 6: Transaction completed successfully!")
+                android.util.Log.d("FarmViewModel", "Step 7: Fetching updated silsilah list...")
                 fetchSilsilahSaya(ownerId, "Pemilik")
+                
+                android.util.Log.d("FarmViewModel", "Step 8: Setting isLoading = false")
+                _isLoading.value = false
+                
+                android.util.Log.d("FarmViewModel", "Step 9: Calling onSuccess callback")
+                android.util.Log.d("FarmViewModel", "========================================")
+                android.util.Log.d("FarmViewModel", "SUCCESS: Silsilah created with ID: $silsilahId")
+                android.util.Log.d("FarmViewModel", "========================================")
                 onSuccess(silsilahId)
+                
             } catch (e: Exception) {
-                android.util.Log.e("DaftarSilsilah", "Error: ${e.message}", e)
-                e.printStackTrace()
+                android.util.Log.e("FarmViewModel", "========================================")
+                android.util.Log.e("FarmViewModel", "ERROR in daftarSilsilah")
+                android.util.Log.e("FarmViewModel", "Error type: ${e.javaClass.simpleName}")
+                android.util.Log.e("FarmViewModel", "Error message: ${e.message}")
+                android.util.Log.e("FarmViewModel", "Stack trace:", e)
+                android.util.Log.e("FarmViewModel", "========================================")
                 
                 // Berikan error message yang lebih spesifik
                 val errorMessage = when {
-                    e.message?.contains("memproses foto") == true -> 
-                        "Gagal memproses foto. Coba pilih foto lain atau lanjutkan tanpa foto."
-                    e.message?.contains("Network") == true -> 
+                    e.message?.contains("memproses foto") == true || e.message?.contains("decode") == true -> 
+                        "Gagal memproses foto: ${e.message}"
+                    e.message?.contains("Network") == true || e.message?.contains("UNAVAILABLE") == true -> 
                         "Koneksi internet bermasalah. Periksa koneksi Anda."
-                    fotoUri.isNotEmpty() ->
-                        "Gagal memproses foto. Coba pilih foto lain atau lanjutkan tanpa foto."
+                    e.message?.contains("PERMISSION_DENIED") == true ->
+                        "Tidak memiliki izin. Periksa aturan Firestore."
                     else -> 
                         "Gagal mendaftar silsilah: ${e.message ?: "Unknown error"}"
                 }
                 
-                onError(errorMessage)
-            } finally {
                 _isLoading.value = false
+                android.util.Log.d("FarmViewModel", "isLoading set to false, calling onError")
+                onError(errorMessage)
             }
         }
     }

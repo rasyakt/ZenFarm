@@ -83,31 +83,11 @@ fun ProfileScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(accentColor, accentDark)
-                        )
-                    )
+                    .shadow(4.dp)
+                    .background(accentColor)
                     .statusBarsPadding()
-                    .padding(bottom = 28.dp)
+                    .padding(bottom = 20.dp)
             ) {
-                // Decorative background circles
-                Box(
-                    modifier = Modifier
-                        .size(160.dp)
-                        .align(Alignment.TopEnd)
-                        .offset(x = 40.dp, y = (-60).dp)
-                        .background(Color.White.copy(alpha = 0.07f), CircleShape)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .align(Alignment.BottomStart)
-                        .offset(x = (-30).dp, y = 30.dp)
-                        .background(Color.White.copy(alpha = 0.06f), CircleShape)
-                )
-
                 Column(modifier = Modifier.fillMaxWidth()) {
                     if (!isBottomNav) {
                         // Back button
@@ -130,7 +110,7 @@ fun ProfileScreen(
                             )
                         }
                     } else {
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
 
                     // Profile section
@@ -143,7 +123,7 @@ fun ProfileScreen(
                         // Avatar circle
                         Box(
                             modifier = Modifier
-                                .size(76.dp)
+                                .size(60.dp)
                                 .clip(CircleShape)
                                 .background(Color.White.copy(alpha = 0.25f)),
                             contentAlignment = Alignment.Center
@@ -151,7 +131,7 @@ fun ProfileScreen(
                             Icon(
                                 imageVector = Icons.Rounded.Person,
                                 contentDescription = "Profile Picture",
-                                modifier = Modifier.size(42.dp),
+                                modifier = Modifier.size(32.dp),
                                 tint = Color.White
                             )
                         }
