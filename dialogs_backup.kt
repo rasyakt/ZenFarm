@@ -441,7 +441,7 @@ fun DaftarSilsilahDialog(
                     OutlinedTextField(
                         value = namaSilsilah,
                         onValueChange = { namaSilsilah = it },
-                        label = { Text("Nama Silsilah (ex: Sapi Limosin A)") },
+                        label = { Text("Nama Silsilah (ex: Sapi Limosin)") },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isLoading,
                         singleLine = true,
