@@ -15,7 +15,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.rounded.AccountBalanceWallet
+import androidx.compose.material.icons.rounded.AccountTree
+import androidx.compose.material.icons.rounded.PendingActions
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -90,7 +95,7 @@ fun PemilikDashboardScreen(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
         ) {
             // ── Modern Header ──
@@ -102,7 +107,8 @@ fun PemilikDashboardScreen(
                             colors = listOf(FarmGreen, FarmGreenLight)
                         )
                     )
-                    .padding(20.dp)
+                    .statusBarsPadding()
+                    .padding(bottom = 20.dp, start = 20.dp, end = 20.dp, top = 16.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -139,11 +145,20 @@ fun PemilikDashboardScreen(
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold
                             )
-                            Text(
-                                text = "👑 Pemilik Peternakan",
-                                color = Color.White.copy(alpha = 0.9f),
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.WorkspacePremium,
+                                    contentDescription = null,
+                                    tint = FarmYellow,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Pemilik Peternakan",
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
 
@@ -180,14 +195,14 @@ fun PemilikDashboardScreen(
             ) {
                 // Row 1: Global & Dompet
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // ── Global Card ──
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .height(110.dp),
+                            .fillMaxHeight(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = CardWhite),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -215,13 +230,14 @@ fun PemilikDashboardScreen(
                                         .background(FarmBlueSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.ic_global),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(32.dp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.Public,
+                                        contentDescription = "Global",
+                                        tint = FarmBlue,
+                                        modifier = Modifier.size(26.dp)
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     "Global",
                                     style = MaterialTheme.typography.titleMedium,
@@ -241,7 +257,7 @@ fun PemilikDashboardScreen(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .height(110.dp),
+                            .fillMaxHeight(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = CardWhite),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -269,9 +285,14 @@ fun PemilikDashboardScreen(
                                         .background(FarmOrangeSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("💰", fontSize = 24.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.AccountBalanceWallet,
+                                        contentDescription = "Dompet",
+                                        tint = FarmOrange,
+                                        modifier = Modifier.size(26.dp)
+                                    )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     "Dompet",
                                     style = MaterialTheme.typography.titleMedium,
@@ -290,7 +311,7 @@ fun PemilikDashboardScreen(
 
                 // Row 2: Pending & Silsilah
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     val hasPending = pendingPenjualans.isNotEmpty()
@@ -301,7 +322,7 @@ fun PemilikDashboardScreen(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .height(110.dp),
+                            .fillMaxHeight(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = CardWhite),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -323,9 +344,14 @@ fun PemilikDashboardScreen(
                                         .background(pendingSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(if (hasPending) "🔔" else "✅", fontSize = 24.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.PendingActions,
+                                        contentDescription = "Pending",
+                                        tint = pendingColor,
+                                        modifier = Modifier.size(26.dp)
+                                    )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     "Pending",
                                     style = MaterialTheme.typography.titleMedium,
@@ -345,7 +371,7 @@ fun PemilikDashboardScreen(
                     Card(
                         modifier = Modifier
                             .weight(1f)
-                            .height(110.dp),
+                            .fillMaxHeight(),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = CardWhite),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -367,9 +393,14 @@ fun PemilikDashboardScreen(
                                         .background(FarmGreenSurface),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("🌿", fontSize = 24.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.AccountTree,
+                                        contentDescription = "Silsilah",
+                                        tint = FarmGreen,
+                                        modifier = Modifier.size(26.dp)
+                                    )
                                 }
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Text(
                                     "Silsilah",
                                     style = MaterialTheme.typography.titleMedium,
@@ -459,8 +490,20 @@ fun PemilikDashboardScreen(
                                 .padding(32.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("🐄", fontSize = 48.sp)
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(80.dp)
+                                    .clip(CircleShape)
+                                    .background(FarmGreenSurface),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_cow),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
                                 "Belum ada silsilah",
                                 style = MaterialTheme.typography.titleMedium,

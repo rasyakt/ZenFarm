@@ -10,7 +10,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.rounded.AccountBalanceWallet
+import androidx.compose.material.icons.rounded.AccountTree
+import androidx.compose.material.icons.rounded.Engineering
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -60,7 +64,7 @@ fun PengurusDashboardScreen(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
         ) {
             // ── Custom Header with Gradient ──
@@ -73,7 +77,8 @@ fun PengurusDashboardScreen(
                             colors = listOf(Color(0xFFFFB300), Color(0xFFBF360C))
                         )
                     )
-                    .padding(20.dp)
+                    .statusBarsPadding()
+                    .padding(bottom = 20.dp, start = 20.dp, end = 20.dp, top = 16.dp)
             ) {
                 // Decorative background circles
                 Box(
@@ -125,11 +130,20 @@ fun PengurusDashboardScreen(
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
-                            Text(
-                                text = "⚙️ Pengurus Ternak",
-                                color = Color.White.copy(alpha = 0.85f),
-                                fontSize = 14.sp
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Engineering,
+                                    contentDescription = null,
+                                    tint = Color.White.copy(alpha = 0.85f),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "Pengurus Ternak",
+                                    color = Color.White.copy(alpha = 0.85f),
+                                    fontSize = 14.sp
+                                )
+                            }
                         }
                     }
 
@@ -208,9 +222,10 @@ fun PengurusDashboardScreen(
                                         .background(FarmBlue.copy(alpha = 0.13f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.ic_global),
-                                        contentDescription = null,
+                                    Icon(
+                                        imageVector = Icons.Rounded.Public,
+                                        contentDescription = "Global",
+                                        tint = FarmBlue,
                                         modifier = Modifier.size(32.dp)
                                     )
                                 }
@@ -267,7 +282,12 @@ fun PengurusDashboardScreen(
                                         .background(FarmOrange.copy(alpha = 0.13f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("💰", fontSize = 26.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.AccountBalanceWallet,
+                                        contentDescription = "Dompet",
+                                        tint = FarmOrange,
+                                        modifier = Modifier.size(28.dp)
+                                    )
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 Text(
@@ -317,7 +337,12 @@ fun PengurusDashboardScreen(
                                         .background(FarmGreen.copy(alpha = 0.13f)),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text("🌿", fontSize = 26.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.AccountTree,
+                                        contentDescription = "Silsilah",
+                                        tint = FarmGreen,
+                                        modifier = Modifier.size(28.dp)
+                                    )
                                 }
                                 Spacer(modifier = Modifier.width(14.dp))
                                 Column {
@@ -377,8 +402,20 @@ fun PengurusDashboardScreen(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("📭", fontSize = 48.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .background(FarmOrange.copy(alpha = 0.13f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_cow),
+                                contentDescription = null,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             "Belum ada silsilah diklaim",
                             fontWeight = FontWeight.SemiBold,

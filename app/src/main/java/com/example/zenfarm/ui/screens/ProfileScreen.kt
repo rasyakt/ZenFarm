@@ -18,11 +18,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -50,7 +52,6 @@ fun ProfileScreen(
     val scrollState = rememberScrollState()
     var isNavigating by remember { mutableStateOf(false) }
 
-    // Use backStackEntry to reset isNavigating when returning to this screen
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     LaunchedEffect(navBackStackEntry) {
         isNavigating = false
@@ -67,44 +68,60 @@ fun ProfileScreen(
         else userHewans.filter { it.status.equals(statusFilter, ignoreCase = true) }
     }
 
+    val isPemilik = user?.role == "Pemilik"
+    val accentColor = if (isPemilik) FarmGreen else FarmOrange
+    val accentDark = if (isPemilik) FarmGreenDark else FarmOrangeDark
+
     Scaffold(
         containerColor = SurfaceLight
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
         ) {
             // ── Premium Header ──
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
                     .background(
                         Brush.verticalGradient(
-                            colors = if (user?.role == "Pemilik") 
-                                listOf(FarmGreen, FarmGreenDark) 
-                            else 
-                                listOf(FarmOrange, Color(0xFFE65100))
+                            colors = listOf(accentColor, accentDark)
                         )
                     )
+                    .statusBarsPadding()
+                    .padding(bottom = 28.dp)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
+                // Decorative background circles
+                Box(
+                    modifier = Modifier
+                        .size(160.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = 40.dp, y = (-60).dp)
+                        .background(Color.White.copy(alpha = 0.07f), CircleShape)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .align(Alignment.BottomStart)
+                        .offset(x = (-30).dp, y = 30.dp)
+                        .background(Color.White.copy(alpha = 0.06f), CircleShape)
+                )
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // Back button
                     IconButton(
-                        onClick = { 
+                        onClick = {
                             if (!isNavigating) {
                                 isNavigating = true
-                                navController.popBackStack() 
+                                navController.popBackStack()
                             }
                         },
                         modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(16.dp)
-                            .background(Color.White.copy(alpha = 0.2f), CircleShape)
+                            .padding(start = 8.dp, top = 8.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.2f))
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -113,22 +130,25 @@ fun ProfileScreen(
                         )
                     }
 
+                    // Profile section
                     Row(
-                        modifier = Modifier.padding(horizontal = 24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Profile Image
+                        // Avatar circle
                         Box(
                             modifier = Modifier
-                                .size(80.dp)
+                                .size(76.dp)
                                 .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.3f))
-                                .padding(4.dp)
+                                .background(Color.White.copy(alpha = 0.25f)),
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Person,
                                 contentDescription = "Profile Picture",
-                                modifier = Modifier.fillMaxSize().clip(CircleShape).padding(8.dp),
+                                modifier = Modifier.size(42.dp),
                                 tint = Color.White
                             )
                         }
@@ -139,14 +159,29 @@ fun ProfileScreen(
                             Text(
                                 text = user?.name ?: "User Name",
                                 color = Color.White,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.titleLarge,
+                                letterSpacing = (-0.3).sp
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = user?.email ?: "email@example.com",
                                 color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 13.sp
+                                style = MaterialTheme.typography.bodySmall
                             )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Card(
+                                shape = RoundedCornerShape(100.dp),
+                                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f))
+                            ) {
+                                Text(
+                                    text = if (isPemilik) "👑 Pemilik Peternakan" else "⚙️ Pengurus Ternak",
+                                    color = Color.White,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                         }
                     }
                 }
@@ -155,24 +190,37 @@ fun ProfileScreen(
             // ── Tabs ──
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = Color.White,
-                contentColor = if (user?.role == "Pemilik") FarmGreen else FarmOrange,
+                containerColor = CardWhite,
+                contentColor = accentColor,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                        color = if (user?.role == "Pemilik") FarmGreen else FarmOrange
+                        color = accentColor,
+                        height = 3.dp
                     )
                 }
             ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("Informasi Profil", fontWeight = FontWeight.SemiBold) }
+                    text = {
+                        Text(
+                            "Informasi Profil",
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
+                            fontSize = 13.sp
+                        )
+                    }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("Daftar Hewan", fontWeight = FontWeight.SemiBold) }
+                    text = {
+                        Text(
+                            "Daftar Hewan",
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
+                            fontSize = 13.sp
+                        )
+                    }
                 )
             }
 
@@ -185,13 +233,13 @@ fun ProfileScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState)
                             .padding(20.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         ProfileItemCard(
                             icon = "⭐",
                             label = "Peran",
                             value = user?.role ?: "User",
-                            color = if (user?.role == "Pemilik") FarmGreen else FarmOrange
+                            color = accentColor
                         )
 
                         ProfileItemCard(
@@ -201,7 +249,7 @@ fun ProfileScreen(
                             color = FarmOrange
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         Button(
                             onClick = {
@@ -215,68 +263,105 @@ fun ProfileScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(56.dp),
+                                .height(54.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = FarmRed,
                                 contentColor = Color.White
-                            )
+                            ),
+                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = null)
+                            Icon(
+                                Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Keluar dari Akun", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(
+                                "Keluar dari Akun",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
                         }
                         
                         Text(
                             text = "ZenFarm v1.0.5 - Premium Edition",
-                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            color = Color.Gray,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
+                            textAlign = TextAlign.Center,
+                            color = TextHint,
                             fontSize = 12.sp
                         )
                     }
                 } else {
                     // TAB: ANIMAL LIST
                     Column(modifier = Modifier.fillMaxSize()) {
-                        // Filters
+                        // Filter chips
                         val statuses = listOf("SEMUA", "HIDUP", "SAKIT", "MATI", "TERJUAL", "DIPULANGKAN")
-                        androidx.compose.foundation.lazy.LazyRow(
-                            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(statuses) { status ->
                                 FilterChip(
                                     selected = statusFilter == status,
                                     onClick = { statusFilter = status },
-                                    label = { Text(status, fontSize = 11.sp) },
+                                    label = {
+                                        Text(
+                                            status,
+                                            fontSize = 11.sp,
+                                            fontWeight = if (statusFilter == status) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = if (user?.role == "Pemilik") FarmGreen else FarmOrange,
-                                        selectedLabelColor = Color.White
+                                        selectedContainerColor = accentColor,
+                                        selectedLabelColor = Color.White,
+                                        containerColor = CardWhite,
+                                        labelColor = TextSecondary
+                                    ),
+                                    border = FilterChipDefaults.filterChipBorder(
+                                        enabled = true,
+                                        selected = statusFilter == status,
+                                        selectedBorderColor = accentColor,
+                                        borderColor = DividerGray
                                     )
                                 )
                             }
                         }
 
                         if (isLoading && userHewans.isEmpty()) {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(color = if (user?.role == "Pemilik") FarmGreen else FarmOrange)
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = accentColor)
                             }
                         } else if (filteredHewans.isEmpty()) {
-                            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text("📭", fontSize = 48.sp)
-                                    Text("Tidak ada hewan ditemukan", color = Color.Gray)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        "Tidak ada hewan ditemukan",
+                                        color = TextSecondary,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
                                 }
                             }
                         } else {
-                            androidx.compose.foundation.lazy.LazyColumn(
+                            LazyColumn(
                                 modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(20.dp),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
                                 items(filteredHewans) { hewan ->
-                                    AnimalListCard(hewan)
+                                    AnimalListCard(hewan, accentColor)
                                 }
+                                item { Spacer(modifier = Modifier.height(16.dp)) }
                             }
                         }
                     }
@@ -287,58 +372,97 @@ fun ProfileScreen(
 }
 
 @Composable
-fun AnimalListCard(hewan: Hewan) {
+fun AnimalListCard(hewan: Hewan, accentColor: Color = FarmGreen) {
+    val statusColor = when (hewan.status.uppercase()) {
+        "HIDUP" -> FarmGreen
+        "SAKIT" -> Color(0xFFFBC02D)
+        "MATI" -> FarmRed
+        "TERJUAL", "DIJUAL" -> FarmBlue
+        "DIPULANGKAN" -> TextSecondary
+        else -> TextSecondary
+    }
+    val genderColor = if (hewan.jenisKelamin.equals("JANTAN", ignoreCase = true))
+        FarmBlue else Color(0xFFE91E63)
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(16.dp),
+                clip = true,
+                spotColor = statusColor.copy(alpha = 0.2f)
+            ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = CardWhite)
     ) {
         Row(
             modifier = Modifier
-                .padding(12.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon or mini photo placeholder
+            // Left accent strip by status
             Box(
                 modifier = Modifier
-                    .size(50.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color.Gray.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
+                    .width(5.dp)
+                    .fillMaxHeight()
+                    .background(statusColor)
+            )
+
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(if (hewan.jenisKelamin == "JANTAN") "♂️" else "♀️", fontSize = 24.sp)
-            }
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            Column(modifier = Modifier.weight(1f)) {
-                Text(hewan.nama, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                Text("Usia: ${hewan.level} Generasi", fontSize = 12.sp, color = Color.Gray)
-            }
-            
-            // Status Tag
-            val statusColor = when (hewan.status.uppercase()) {
-                "HIDUP" -> FarmGreen
-                "SAKIT" -> Color(0xFFFBC02D)
-                "MATI" -> FarmRed
-                "TERJUAL", "DIJUAL" -> FarmBlue
-                "DIPULANGKAN" -> Color.Gray
-                else -> Color.Gray
-            }
-            
-            Card(
-                shape = RoundedCornerShape(8.dp),
-                colors = CardDefaults.cardColors(containerColor = statusColor.copy(alpha = 0.15f))
-            ) {
-                Text(
-                    text = hewan.status,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    color = statusColor,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                // Gender circle icon
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(genderColor.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        if (hewan.jenisKelamin.equals("JANTAN", ignoreCase = true)) "♂" else "♀",
+                        fontSize = 22.sp,
+                        color = genderColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(14.dp))
+                
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        hewan.nama,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        color = TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        "Generasi ke-${hewan.level}",
+                        fontSize = 12.sp,
+                        color = TextSecondary,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+                
+                // Status Tag
+                Card(
+                    shape = RoundedCornerShape(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = statusColor.copy(alpha = 0.12f))
+                ) {
+                    Text(
+                        text = hewan.status.uppercase(),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        color = statusColor,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
@@ -352,10 +476,16 @@ fun ProfileItemCard(
     color: Color
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 3.dp,
+                shape = RoundedCornerShape(16.dp),
+                clip = true,
+                spotColor = color.copy(alpha = 0.2f)
+            ),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = CardWhite)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -363,7 +493,7 @@ fun ProfileItemCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(46.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .background(color.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
@@ -371,10 +501,27 @@ fun ProfileItemCard(
                 Text(icon, fontSize = 22.sp)
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(label, color = Color.Gray, fontSize = 12.sp)
-                Text(value, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.Black)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    label,
+                    color = TextHint,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    value,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = TextPrimary
+                )
             }
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(color)
+            )
         }
     }
 }

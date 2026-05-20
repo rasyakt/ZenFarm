@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -51,21 +52,30 @@ fun GlobalScreen(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(bottom = paddingValues.calculateBottomPadding())
                 .fillMaxSize()
         ) {
-            // ── Custom Header ──
+            // ── Premium Header ──
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(12.dp, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                    .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                     .background(
-                        Brush.linearGradient(
+                        Brush.verticalGradient(
                             colors = listOf(FarmBlue, Color(0xFF0D47A1))
                         )
                     )
-                    .padding(20.dp)
+                    .statusBarsPadding()
+                    .padding(bottom = 16.dp, start = 8.dp, end = 8.dp, top = 8.dp)
             ) {
+                // Decorative circles
+                Box(
+                    modifier = Modifier
+                        .size(120.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = 30.dp, y = (-50).dp)
+                        .background(Color.White.copy(alpha = 0.08f), CircleShape)
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -75,21 +85,21 @@ fun GlobalScreen(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Kembali",
                             tint = Color.White,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(26.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
                             text = "🌐 GLOBAL Marketplace",
                             color = Color.White,
-                            fontSize = 22.sp,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "Temukan tawaran silsilah baru",
                             color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 13.sp
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -99,28 +109,51 @@ fun GlobalScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp, vertical = 14.dp)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        clip = true,
+                        spotColor = FarmBlue.copy(alpha = 0.25f)
+                    ),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = FarmBlueSurface)
+                colors = CardDefaults.cardColors(containerColor = CardWhite)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(CardWhite, FarmBlueSurface.copy(alpha = 0.4f))
+                            )
+                        )
+                        .padding(16.dp)
                 ) {
-                    Text("💡", fontSize = 24.sp)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            "Tersedia ${globalSilsilahs.size} tawaran",
-                            fontWeight = FontWeight.Bold,
-                            color = FarmBlue,
-                            fontSize = 15.sp
-                        )
-                        Text(
-                            "Klaim silsilah untuk mulai mengelola ternak",
-                            color = Color.Gray,
-                            fontSize = 12.sp
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(FarmBlueSurface),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("💡", fontSize = 22.sp)
+                        }
+                        Spacer(modifier = Modifier.width(14.dp))
+                        Column {
+                            Text(
+                                "Tersedia ${globalSilsilahs.size} tawaran",
+                                fontWeight = FontWeight.Bold,
+                                color = FarmBlue,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                "Klaim silsilah untuk mulai mengelola ternak",
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
@@ -142,12 +175,12 @@ fun GlobalScreen(
                         Text(
                             "Tidak ada tawaran saat ini",
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray,
+                            color = TextSecondary,
                             fontSize = 16.sp
                         )
                         Text(
                             "Cek kembali nanti",
-                            color = Color.Gray,
+                            color = TextHint,
                             fontSize = 13.sp
                         )
                     }
@@ -160,20 +193,25 @@ fun GlobalScreen(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .shadow(6.dp, RoundedCornerShape(16.dp), spotColor = Color(0xFF0D47A1).copy(alpha = 0.5f)),
-                                shape = RoundedCornerShape(16.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color.White)
+                                    .shadow(
+                                        elevation = 5.dp,
+                                        shape = RoundedCornerShape(18.dp),
+                                        clip = true,
+                                        spotColor = FarmBlue.copy(alpha = 0.25f)
+                                    ),
+                                shape = RoundedCornerShape(18.dp),
+                                colors = CardDefaults.cardColors(containerColor = CardWhite)
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Box(
                                             modifier = Modifier
-                                                .size(48.dp)
-                                                .clip(RoundedCornerShape(12.dp))
+                                                .size(52.dp)
+                                                .clip(RoundedCornerShape(14.dp))
                                                 .background(FarmBlueSurface),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Text("🌳", fontSize = 24.sp)
+                                            Text("🌳", fontSize = 26.sp)
                                         }
                                         Spacer(modifier = Modifier.width(14.dp))
                                         Column(modifier = Modifier.weight(1f)) {
@@ -183,6 +221,7 @@ fun GlobalScreen(
                                                 fontSize = 17.sp,
                                                 color = Color(0xFF0D47A1)
                                             )
+                                            Spacer(modifier = Modifier.height(4.dp))
                                             Card(
                                                 shape = RoundedCornerShape(6.dp),
                                                 colors = CardDefaults.cardColors(
@@ -190,7 +229,7 @@ fun GlobalScreen(
                                                 )
                                             ) {
                                                 Text(
-                                                    "TERSEDIA",
+                                                    "✅ TERSEDIA",
                                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                                     color = FarmGreen,
                                                     fontSize = 10.sp,
@@ -200,6 +239,8 @@ fun GlobalScreen(
                                         }
                                     }
                                     
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    HorizontalDivider(color = DividerGray)
                                     Spacer(modifier = Modifier.height(14.dp))
                                     
                                     Button(
@@ -217,16 +258,22 @@ fun GlobalScreen(
                                                 )
                                             }
                                         },
-                                        modifier = Modifier.fillMaxWidth().height(44.dp),
-                                        shape = RoundedCornerShape(12.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(48.dp),
+                                        shape = RoundedCornerShape(14.dp),
                                         colors = ButtonDefaults.buttonColors(
                                             containerColor = FarmBlue
+                                        ),
+                                        elevation = ButtonDefaults.buttonElevation(
+                                            defaultElevation = 4.dp
                                         )
                                     ) {
                                         Text(
-                                            "🤝 Klaim Silsilah",
+                                            "🤝  Klaim Silsilah",
                                             fontSize = 15.sp,
-                                            fontWeight = FontWeight.SemiBold
+                                            fontWeight = FontWeight.Bold,
+                                            letterSpacing = 0.5.sp
                                         )
                                     }
                                 }
