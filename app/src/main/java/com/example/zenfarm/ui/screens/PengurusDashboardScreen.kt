@@ -55,14 +55,11 @@ fun PengurusDashboardScreen(
         }
     }
 
-    Scaffold(
-        containerColor = SurfaceLight
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(bottom = paddingValues.calculateBottomPadding())
-                .fillMaxSize()
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SurfaceLight)
+    ) {
             // ── Custom Header with Gradient ──
             Box(
                 modifier = Modifier
@@ -143,164 +140,16 @@ fun PengurusDashboardScreen(
                         }
                     }
 
-                    // Logout button
-                    IconButton(
-                        onClick = {
-                            if (!isNavigating) {
-                                isNavigating = true
-                                authViewModel.logout()
-                                navController.navigate("login") { popUpTo(0) }
-                            }
-                        },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.15f))
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
-                        )
-                    }
                 }
             }
 
-            // ── Quick Action Cards ──
+            // ── Dashboard Stats ──
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Row 1: Global & Dompet — equal height via IntrinsicSize
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // ── Global Marketplace Card ──
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = FarmBlue.copy(alpha = 0.35f)),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                        onClick = {
-                            if (!isNavigating) {
-                                isNavigating = true
-                                navController.navigate("global")
-                            }
-                        }
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB))
-                                    )
-                                )
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(54.dp)
-                                        .clip(CircleShape)
-                                        .background(FarmBlue.copy(alpha = 0.13f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Public,
-                                        contentDescription = "Global",
-                                        tint = FarmBlue,
-                                        modifier = Modifier.size(32.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    "GLOBAL",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = FarmBlue,
-                                    fontSize = 14.sp
-                                )
-                                Text(
-                                    "Cari Tawaran",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                        }
-                    }
-
-                    // ── Dompet Card ──
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .shadow(6.dp, RoundedCornerShape(20.dp), spotColor = FarmOrange.copy(alpha = 0.35f)),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                        onClick = {
-                            if (!isNavigating) {
-                                isNavigating = true
-                                navController.navigate("dompet")
-                            }
-                        }
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFFFFF8E1), Color(0xFFFFECC7))
-                                    )
-                                )
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(54.dp)
-                                        .clip(CircleShape)
-                                        .background(FarmOrange.copy(alpha = 0.13f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.AccountBalanceWallet,
-                                        contentDescription = "Dompet",
-                                        tint = FarmOrange,
-                                        modifier = Modifier.size(28.dp)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    "Dompet",
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = FarmOrange,
-                                    fontSize = 14.sp
-                                )
-                                Text(
-                                    "Riwayat",
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                            }
-                        }
-                    }
-                }
 
                 // ── Silsilah — Full-Width Horizontal Banner Card ──
                 Card(
@@ -517,5 +366,4 @@ fun PengurusDashboardScreen(
                 }
             }
         }
-    }
 }

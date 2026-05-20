@@ -41,7 +41,8 @@ import com.example.zenfarm.viewmodel.FarmViewModel
 fun ProfileScreen(
     authViewModel: AuthViewModel,
     farmViewModel: FarmViewModel,
-    navController: NavController
+    navController: NavController,
+    isBottomNav: Boolean = false
 ) {
     val user by authViewModel.user.collectAsState()
     val userHewans by farmViewModel.userHewans.collectAsState()
@@ -73,14 +74,11 @@ fun ProfileScreen(
     val accentColor = if (isPemilik) FarmGreen else FarmOrange
     val accentDark = if (isPemilik) FarmGreenDark else FarmOrangeDark
 
-    Scaffold(
-        containerColor = SurfaceLight
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(bottom = paddingValues.calculateBottomPadding())
-                .fillMaxSize()
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SurfaceLight)
+    ) {
             // ── Premium Header ──
             Box(
                 modifier = Modifier
@@ -111,24 +109,28 @@ fun ProfileScreen(
                 )
 
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    // Back button
-                    IconButton(
-                        onClick = {
-                            if (!isNavigating) {
-                                isNavigating = true
-                                navController.popBackStack()
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(start = 8.dp, top = 8.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.2f))
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
+                    if (!isBottomNav) {
+                        // Back button
+                        IconButton(
+                            onClick = {
+                                if (!isNavigating) {
+                                    isNavigating = true
+                                    navController.popBackStack()
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(start = 8.dp, top = 8.dp)
+                                .clip(CircleShape)
+                                .background(Color.White.copy(alpha = 0.2f))
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = Color.White
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
 
                     // Profile section
@@ -385,7 +387,6 @@ fun ProfileScreen(
                 }
             }
         }
-    }
 }
 
 @Composable

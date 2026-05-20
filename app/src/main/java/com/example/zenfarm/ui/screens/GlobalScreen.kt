@@ -34,7 +34,8 @@ import kotlinx.coroutines.launch
 fun GlobalScreen(
     authViewModel: AuthViewModel,
     farmViewModel: FarmViewModel,
-    navController: NavController
+    navController: NavController,
+    isBottomNav: Boolean = false
 ) {
     val user by authViewModel.user.collectAsState()
     val globalSilsilahs by farmViewModel.globalSilsilahs.collectAsState()
@@ -49,7 +50,8 @@ fun GlobalScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        containerColor = SurfaceLight
+        containerColor = SurfaceLight,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -81,15 +83,17 @@ fun GlobalScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
-                        )
+                    if (!isBottomNav) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Kembali",
+                                tint = Color.White,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(

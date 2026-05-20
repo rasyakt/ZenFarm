@@ -36,7 +36,8 @@ import java.util.Locale
 fun WalletScreen(
     authViewModel: AuthViewModel,
     farmViewModel: FarmViewModel,
-    navController: NavController
+    navController: NavController,
+    isBottomNav: Boolean = false
 ) {
     val user by authViewModel.user.collectAsState()
     val riwayatPenjualan by farmViewModel.riwayatPenjualan.collectAsState()
@@ -59,14 +60,11 @@ fun WalletScreen(
         if (p < 0) -p else 0
     }
 
-    Scaffold(
-        containerColor = SurfaceLight
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(bottom = paddingValues.calculateBottomPadding())
-                .fillMaxSize()
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SurfaceLight)
+    ) {
             // ── Custom Header ──
             Box(
                 modifier = Modifier
@@ -84,15 +82,17 @@ fun WalletScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Kembali",
-                            tint = Color.White,
-                            modifier = Modifier.size(26.dp)
-                        )
+                    if (!isBottomNav) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Kembali",
+                                tint = Color.White,
+                                modifier = Modifier.size(26.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
-                    Spacer(modifier = Modifier.width(4.dp))
                     Column {
                         Text(
                             text = "Dompet Saya",
@@ -553,5 +553,4 @@ fun WalletScreen(
                 }
             }
         }
-    }
 }

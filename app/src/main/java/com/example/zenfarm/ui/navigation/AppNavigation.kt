@@ -10,6 +10,7 @@ import com.example.zenfarm.viewmodel.FarmViewModel
 import com.example.zenfarm.ui.screens.LoginScreen
 import com.example.zenfarm.ui.screens.RegisterScreen
 
+import com.example.zenfarm.ui.screens.MainScreen
 import com.example.zenfarm.ui.screens.PemilikDashboardScreen
 import com.example.zenfarm.ui.screens.PengurusDashboardScreen
 import com.example.zenfarm.ui.screens.GlobalScreen
@@ -37,14 +38,8 @@ fun AppNavigation(
             LoginScreen(
                 viewModel = authViewModel,
                 onLoginSuccess = { role ->
-                    if (role == "Pemilik") {
-                        navController.navigate("dashboard_pemilik") {
-                            popUpTo("login") { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate("dashboard_pengurus") {
-                            popUpTo("login") { inclusive = true }
-                        }
+                    navController.navigate("main/$role") {
+                        popUpTo("login") { inclusive = true }
                     }
                 },
                 onNavigateToRegister = {
@@ -69,12 +64,12 @@ fun AppNavigation(
             )
         }
         
-        composable("dashboard_pemilik") {
-            PemilikDashboardScreen(authViewModel, farmViewModel, navController)
-        }
-
-        composable("dashboard_pengurus") {
-            PengurusDashboardScreen(authViewModel, farmViewModel, navController)
+        composable(
+            "main/{role}",
+            arguments = listOf(navArgument("role") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val role = backStackEntry.arguments?.getString("role") ?: "Pemilik"
+            MainScreen(authViewModel, farmViewModel, navController, role)
         }
         
         composable("global") {
