@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -174,13 +175,24 @@ fun ProfileScreen(
                                 shape = RoundedCornerShape(100.dp),
                                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.2f))
                             ) {
-                                Text(
-                                    text = if (isPemilik) "👑 Pemilik Peternakan" else "⚙️ Pengurus Ternak",
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
-                                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                                    fontWeight = FontWeight.SemiBold
-                                )
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = if (isPemilik) Icons.Rounded.WorkspacePremium else Icons.Rounded.Engineering,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (isPemilik) "Pemilik Peternakan" else "Pengurus Ternak",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
                             }
                         }
                     }
@@ -236,14 +248,14 @@ fun ProfileScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         ProfileItemCard(
-                            icon = "⭐",
+                            icon = Icons.Rounded.WorkspacePremium,
                             label = "Peran",
                             value = user?.role ?: "User",
                             color = accentColor
                         )
 
                         ProfileItemCard(
-                            icon = "💰",
+                            icon = Icons.Rounded.AccountBalanceWallet,
                             label = "Total Saldo",
                             value = "Rp ${user?.saldo ?: 0}",
                             color = FarmOrange
@@ -343,7 +355,12 @@ fun ProfileScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("📭", fontSize = 48.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.Pets,
+                                        contentDescription = null,
+                                        tint = TextSecondary.copy(alpha = 0.5f),
+                                        modifier = Modifier.size(48.dp)
+                                    )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         "Tidak ada hewan ditemukan",
@@ -424,11 +441,11 @@ fun AnimalListCard(hewan: Hewan, accentColor: Color = FarmGreen) {
                         .background(genderColor.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        if (hewan.jenisKelamin.equals("JANTAN", ignoreCase = true)) "♂" else "♀",
-                        fontSize = 22.sp,
-                        color = genderColor,
-                        fontWeight = FontWeight.Bold
+                    Icon(
+                        imageVector = if (hewan.jenisKelamin.equals("JANTAN", ignoreCase = true)) Icons.Rounded.Male else Icons.Rounded.Female,
+                        contentDescription = null,
+                        tint = genderColor,
+                        modifier = Modifier.size(26.dp)
                     )
                 }
                 
@@ -470,7 +487,7 @@ fun AnimalListCard(hewan: Hewan, accentColor: Color = FarmGreen) {
 
 @Composable
 fun ProfileItemCard(
-    icon: String,
+    icon: ImageVector,
     label: String,
     value: String,
     color: Color
@@ -498,7 +515,12 @@ fun ProfileItemCard(
                     .background(color.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(icon, fontSize = 22.sp)
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(24.dp)
+                )
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {

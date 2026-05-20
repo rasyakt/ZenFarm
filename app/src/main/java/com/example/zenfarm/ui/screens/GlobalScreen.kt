@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -90,12 +91,21 @@ fun GlobalScreen(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
-                        Text(
-                            text = "🌐 GLOBAL Marketplace",
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Public,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "GLOBAL Marketplace",
+                                color = Color.White,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                         Text(
                             text = "Temukan tawaran silsilah baru",
                             color = Color.White.copy(alpha = 0.7f),
@@ -137,7 +147,12 @@ fun GlobalScreen(
                                 .background(FarmBlueSurface),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("💡", fontSize = 22.sp)
+                            Icon(
+                                imageVector = Icons.Rounded.Lightbulb,
+                                contentDescription = null,
+                                tint = FarmBlue,
+                                modifier = Modifier.size(26.dp)
+                            )
                         }
                         Spacer(modifier = Modifier.width(14.dp))
                         Column {
@@ -170,7 +185,12 @@ fun GlobalScreen(
                         modifier = Modifier.align(Alignment.Center),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("🏷️", fontSize = 48.sp)
+                        Icon(
+                            imageVector = Icons.Rounded.LocalOffer,
+                            contentDescription = null,
+                            tint = TextSecondary.copy(alpha = 0.5f),
+                            modifier = Modifier.size(48.dp)
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "Tidak ada tawaran saat ini",
@@ -211,7 +231,12 @@ fun GlobalScreen(
                                                 .background(FarmBlueSurface),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Text("🌳", fontSize = 26.sp)
+                                            Icon(
+                                                imageVector = Icons.Rounded.AccountTree,
+                                                contentDescription = null,
+                                                tint = FarmBlue,
+                                                modifier = Modifier.size(28.dp)
+                                            )
                                         }
                                         Spacer(modifier = Modifier.width(14.dp))
                                         Column(modifier = Modifier.weight(1f)) {
@@ -228,13 +253,24 @@ fun GlobalScreen(
                                                     containerColor = FarmGreenSurface
                                                 )
                                             ) {
-                                                Text(
-                                                    "✅ TERSEDIA",
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                                    color = FarmGreen,
-                                                    fontSize = 10.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                )
+                                                Row(
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Icon(
+                                                        imageVector = Icons.Rounded.CheckCircle,
+                                                        contentDescription = null,
+                                                        tint = FarmGreen,
+                                                        modifier = Modifier.size(12.dp)
+                                                    )
+                                                    Spacer(modifier = Modifier.width(4.dp))
+                                                    Text(
+                                                        "TERSEDIA",
+                                                        color = FarmGreen,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -269,12 +305,20 @@ fun GlobalScreen(
                                             defaultElevation = 4.dp
                                         )
                                     ) {
-                                        Text(
-                                            "🤝  Klaim Silsilah",
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 0.5.sp
-                                        )
+                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Handshake,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                "Klaim Silsilah",
+                                                fontSize = 15.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                letterSpacing = 0.5.sp
+                                            )
+                                        }
                                     }
                                 }
                             }

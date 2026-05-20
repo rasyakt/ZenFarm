@@ -10,11 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
-import androidx.compose.material.icons.rounded.AccountTree
-import androidx.compose.material.icons.rounded.Engineering
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -380,13 +376,24 @@ fun PengurusDashboardScreen(
             }
             
             // ── Silsilah List Header ──
-            Text(
-                "📋 Silsilah Saya",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFE65100),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.AccountTree,
+                    contentDescription = null,
+                    tint = Color(0xFFE65100),
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    "Silsilah Saya",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFE65100)
+                )
+            }
             
             Spacer(modifier = Modifier.height(8.dp))
             
@@ -497,7 +504,12 @@ fun PengurusDashboardScreen(
                                         }
                                     }
                                     
-                                    Text("▶", color = FarmOrange, fontSize = 18.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.ChevronRight,
+                                        contentDescription = null,
+                                        tint = FarmOrange,
+                                        modifier = Modifier.size(24.dp)
+                                    )
                                 }
                             }
                         }

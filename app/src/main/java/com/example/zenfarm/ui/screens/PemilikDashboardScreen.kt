@@ -21,6 +21,9 @@ import androidx.compose.material.icons.rounded.PendingActions
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.WorkspacePremium
+import androidx.compose.material.icons.rounded.Pets
+import androidx.compose.material.icons.rounded.AddPhotoAlternate
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -1150,9 +1153,11 @@ fun DaftarSilsilahDialog(
         containerColor = Color.White,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    if (step == 1) "🌿" else "🐄",
-                    fontSize = 24.sp
+                Icon(
+                    imageVector = if (step == 1) Icons.Rounded.AccountTree else Icons.Rounded.Pets,
+                    contentDescription = null,
+                    tint = FarmGreenDark,
+                    modifier = Modifier.size(28.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -1271,11 +1276,28 @@ fun DaftarSilsilahDialog(
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = FarmGreen)
                         ) {
-                            Text("📸 Pilih Foto Induk")
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.AddPhotoAlternate,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Pilih Foto Induk")
+                            }
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         if (fotoUri.isNotEmpty()) {
-                            Text("✅ Foto terpilih", color = FarmGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.CheckCircle,
+                                    contentDescription = null,
+                                    tint = FarmGreen,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Foto terpilih", color = FarmGreen, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }

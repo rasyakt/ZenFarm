@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -169,7 +170,12 @@ fun WalletScreen(
                                         fontSize = 18.sp,
                                         letterSpacing = 1.sp
                                     )
-                                    Text("💳", fontSize = 28.sp)
+                                    Icon(
+                                        imageVector = Icons.Rounded.CreditCard,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(28.dp)
+                                    )
                                 }
 
                                 Spacer(modifier = Modifier.height(20.dp))
@@ -199,7 +205,12 @@ fun WalletScreen(
                                     horizontalArrangement = Arrangement.SpaceAround
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("📊", fontSize = 18.sp)
+                                        Icon(
+                                            imageVector = Icons.Rounded.BarChart,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(22.dp)
+                                        )
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text(
                                             "${riwayatPenjualan.size}",
@@ -220,7 +231,12 @@ fun WalletScreen(
                                             .background(Color.White.copy(alpha = 0.3f))
                                     )
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("📈", fontSize = 18.sp)
+                                        Icon(
+                                            imageVector = Icons.Rounded.TrendingUp,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(22.dp)
+                                        )
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text(
                                             "Rp $totalUntung",
@@ -243,7 +259,12 @@ fun WalletScreen(
                                             .background(Color.White.copy(alpha = 0.3f))
                                     )
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text("📉", fontSize = 18.sp)
+                                        Icon(
+                                            imageVector = Icons.Rounded.TrendingDown,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(22.dp)
+                                        )
                                         Spacer(modifier = Modifier.height(2.dp))
                                         Text(
                                             "Rp $totalRugi",
@@ -267,13 +288,24 @@ fun WalletScreen(
 
                 // ── Riwayat Header ──
                 item {
-                    Text(
-                        "📋 Riwayat Penjualan",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = FarmGreenDark,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.History,
+                            contentDescription = null,
+                            tint = FarmGreenDark,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Riwayat Penjualan",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = FarmGreenDark
+                        )
+                    }
                     Spacer(modifier = Modifier.height(4.dp))
                 }
 
@@ -298,7 +330,12 @@ fun WalletScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("📭", fontSize = 48.sp)
+                                Icon(
+                                    imageVector = Icons.Rounded.Inbox,
+                                    contentDescription = null,
+                                    tint = TextSecondary.copy(alpha = 0.5f),
+                                    modifier = Modifier.size(48.dp)
+                                )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
                                     "Belum ada riwayat penjualan",
@@ -346,7 +383,12 @@ fun WalletScreen(
                                                 .background(FarmGreenSurface),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Text("🐄", fontSize = 22.sp)
+                                            Icon(
+                                                imageVector = Icons.Rounded.Pets,
+                                                contentDescription = null,
+                                                tint = FarmGreen,
+                                                modifier = Modifier.size(24.dp)
+                                            )
                                         }
                                         Spacer(modifier = Modifier.width(10.dp))
                                         Column {
