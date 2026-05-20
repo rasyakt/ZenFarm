@@ -267,45 +267,48 @@ fun GlobalScreen(
                                     HorizontalDivider(color = DividerGray)
                                     Spacer(modifier = Modifier.height(14.dp))
                                     
-                                    Button(
-                                        onClick = {
-                                            user?.let { u ->
-                                                farmViewModel.ambilTawaran(
-                                                    silsilah = s,
-                                                    pengurusId = u.userId,
-                                                    onSuccess = {
-                                                        scope.launch { snackbarHostState.showSnackbar("Berhasil klaim silsilah!") }
-                                                    },
-                                                    onError = { errorMsg ->
-                                                        scope.launch { snackbarHostState.showSnackbar(errorMsg) }
-                                                    }
+                                    if (user?.role == "Pengurus") {
+                                        Button(
+                                            onClick = {
+                                                user?.let { u ->
+                                                    farmViewModel.ambilTawaran(
+                                                        silsilah = s,
+                                                        pengurusId = u.userId,
+                                                        userRole = u.role,
+                                                        onSuccess = {
+                                                            scope.launch { snackbarHostState.showSnackbar("Berhasil klaim silsilah!") }
+                                                        },
+                                                        onError = { errorMsg ->
+                                                            scope.launch { snackbarHostState.showSnackbar(errorMsg) }
+                                                        }
+                                                    )
+                                                }
+                                            },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(48.dp),
+                                            shape = RoundedCornerShape(14.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = FarmBlue
+                                            ),
+                                            elevation = ButtonDefaults.buttonElevation(
+                                                defaultElevation = 4.dp
+                                            )
+                                        ) {
+                                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.Handshake,
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    "Klaim Silsilah",
+                                                    fontSize = 15.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    letterSpacing = 0.5.sp
                                                 )
                                             }
-                                        },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(48.dp),
-                                        shape = RoundedCornerShape(14.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = FarmBlue
-                                        ),
-                                        elevation = ButtonDefaults.buttonElevation(
-                                            defaultElevation = 4.dp
-                                        )
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.Handshake,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                "Klaim Silsilah",
-                                                fontSize = 15.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                letterSpacing = 0.5.sp
-                                            )
                                         }
                                     }
                                 }

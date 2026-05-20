@@ -285,8 +285,12 @@ class FarmViewModel : ViewModel() {
     }
 
     // Role: Pengurus action
-    fun ambilTawaran(silsilah: Silsilah, pengurusId: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun ambilTawaran(silsilah: Silsilah, pengurusId: String, userRole: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
+            if (userRole != "Pengurus") {
+                onError("Hanya akun Pengurus yang dapat mengklaim silsilah")
+                return@launch
+            }
             if (silsilah.status != "GLOBAL") {
                 onError("Hewan sudah diklaim")
                 return@launch
