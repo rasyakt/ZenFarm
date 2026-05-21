@@ -305,6 +305,7 @@ fun PemilikDashboardScreen(
                                     farmViewModel.acceptPenjualan(
                                         penjualan = penjualan,
                                         ownerId = u.userId,
+                                        userRole = u.role,
                                         onSuccess = {
                                             scope.launch {
                                                 snackbarHostState.showSnackbar("Penjualan disetujui!")
@@ -674,6 +675,7 @@ fun PemilikDashboardScreen(
                             penjualan = penjualanToReject!!,
                             alasan = alasan,
                             ownerId = u.userId,
+                            userRole = u.role,
                             onSuccess = {
                                 scope.launch {
                                     snackbarHostState.showSnackbar("Penjualan ditolak.")

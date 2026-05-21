@@ -1,4 +1,4 @@
-package com.example.zenfarm.ui.screens
+﻿package com.example.zenfarm.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -23,6 +23,14 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.rounded.AddCircle
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Male
+import androidx.compose.material.icons.rounded.Female
+import androidx.compose.material.icons.rounded.Pets
+import androidx.compose.material.icons.rounded.ShoppingCart
+import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,9 +68,9 @@ import com.example.zenfarm.viewmodel.AuthViewModel
 import com.example.zenfarm.viewmodel.FarmViewModel
 import kotlinx.coroutines.launch
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Constants
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private const val MIN_SCALE = 0.2f
 private const val MAX_SCALE = 2.5f
 private val MIN_CHILD_SPACING = 120.dp
@@ -70,9 +79,9 @@ private val CENTER_SPACING = NODE_WIDTH + MIN_CHILD_SPACING
 private val PARTNER_CONN_WIDTH = 68.dp // 36dp icon + 2*16dp padding
 private val PAIR_WIDTH = NODE_WIDTH + PARTNER_CONN_WIDTH + NODE_WIDTH
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main Screen
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -273,7 +282,7 @@ fun SilsilahCanvasScreen(
             }
         }
 
-        // ── Detail & Status Dialog (Both roles) ──
+        // â”€â”€ Detail & Status Dialog (Both roles) â”€â”€
         if (hewanToView != null) {
             AnimalDetailDialog(
                 hewan = hewanToView!!,
@@ -283,6 +292,7 @@ fun SilsilahCanvasScreen(
                         silsilahId = silsilahId,
                         hewanId = hewanToView!!.hewanId,
                         newStatus = newStatus,
+                        userRole = user?.role ?: "",
                         onSuccess = { hewanToView = null }
                     )
                 },
@@ -290,7 +300,7 @@ fun SilsilahCanvasScreen(
             )
         }
 
-        // ── Sell Dialog (Pengurus flow – with confirmation + margin) ──
+        // â”€â”€ Sell Dialog (Pengurus flow â€“ with confirmation + margin) â”€â”€
         if (hewanToSell != null && isPengurus) {
             var confirmStep by remember { mutableIntStateOf(1) }
             
@@ -397,6 +407,7 @@ fun SilsilahCanvasScreen(
                                             it, 
                                             hargaJualInt, 
                                             u.userId,
+                                            u.role,
                                             buyerNameText,
                                             buyerPhoneText,
                                             onSuccess = { isDirect ->
@@ -423,7 +434,7 @@ fun SilsilahCanvasScreen(
             }
         }
 
-        // ── Sell Dialog (Pemilik flow – shows seller contact) ──
+        // â”€â”€ Sell Dialog (Pemilik flow â€“ shows seller contact) â”€â”€
         if (hewanToSell != null && isPemilik) {
             // Fetch pengurus info
             LaunchedEffect(hewanToSell) {
@@ -448,7 +459,7 @@ fun SilsilahCanvasScreen(
             }
         }
 
-        // ── Partner Info Dialog ──
+        // â”€â”€ Partner Info Dialog â”€â”€
         if (partnerInfoPair != null) {
             PartnerInfoDialog(
                 female = partnerInfoPair!!.first,
@@ -459,9 +470,9 @@ fun SilsilahCanvasScreen(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /**
  * Recursively calculates the total width required for a complete family branch.
@@ -491,9 +502,9 @@ fun calculateSubtreeWidth(betina: Hewan, allHewans: List<Hewan>): androidx.compo
     return maxOf(rawOwnWidth, totalChildrenWidth)
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Family Tree Level – Recursive layout for each mother + partner + children
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Family Tree Level â€“ Recursive layout for each mother + partner + children
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun FamilyTreeLevel(
@@ -523,7 +534,7 @@ fun FamilyTreeLevel(
             .width(ownSubtreeWidth)
             .padding(vertical = 8.dp)
     ) {
-        // ── Parent row: Female ✕ Male ──
+        // â”€â”€ Parent row: Female âœ• Male â”€â”€
         Row(
             modifier = Modifier.wrapContentWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -576,7 +587,7 @@ fun FamilyTreeLevel(
             }
         }
 
-        // ── Children branch ──
+        // â”€â”€ Children branch â”€â”€
         if (children.isNotEmpty()) {
             Box(
                 modifier = Modifier
@@ -644,9 +655,9 @@ fun FamilyTreeLevel(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tree Branch Connector – Horizontal bar with vertical drops for N children
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Tree Branch Connector â€“ Horizontal bar with vertical drops for N children
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun TreeBranchConnector(
@@ -704,9 +715,9 @@ fun TreeBranchConnector(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Hewan Node – Individual animal card
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Hewan Node â€“ Individual animal card
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun HewanNode(
@@ -722,79 +733,122 @@ fun HewanNode(
     onNodeTap: (LayoutCoordinates) -> Unit
 ) {
     val isJantan = hewan.jenisKelamin.equals("JANTAN", ignoreCase = true)
-    val blueGradient = Brush.linearGradient(colors = listOf(Color(0xFF2196F3), Color(0xFF0D47A1)))
-    val pinkGradient = Brush.linearGradient(colors = listOf(Color(0xFFE91E63), Color(0xFF880E4F)))
-    val containerBrush = if (isJantan) blueGradient else pinkGradient
+    val isBetina = hewan.jenisKelamin.equals("BETINA", ignoreCase = true)
+    val isHidup = hewan.status.equals("HIDUP", ignoreCase = true)
+    val isSakit = hewan.status.equals("SAKIT", ignoreCase = true)
+    val isActive = isHidup || isSakit
+
     val mainColor = if (isJantan) Color(0xFF1976D2) else Color(0xFFD81B60)
-    val onCardColor = Color.White
-    val borderColor = if (hewan.status.equals("HIDUP", true)) Color.White.copy(alpha = 0.5f) else Color.DarkGray
+    val darkBg = if (isJantan) Color(0xFF0D47A1) else Color(0xFF880E4F)
+    val gradientBrush = Brush.verticalGradient(colors = listOf(mainColor, darkBg))
+
+    val statusColor = when {
+        isHidup -> Color(0xFF4CAF50)
+        isSakit -> Color(0xFFFF9800)
+        hewan.status.equals("MATI", true) -> Color(0xFFF44336)
+        hewan.status.equals("TERJUAL", true) -> Color(0xFF607D8B)
+        else -> Color(0xFF9E9E9E)
+    }
 
     var nodeCoords by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     Card(
         modifier = Modifier
-            .requiredWidth(180.dp)
+            .requiredWidth(200.dp)
             .padding(8.dp)
             .onGloballyPositioned { nodeCoords = it }
-            .shadow(12.dp, RoundedCornerShape(16.dp), spotColor = if(isJantan) Color(0xFF1976D2) else Color(0xFFD81B60))
+            .shadow(10.dp, RoundedCornerShape(20.dp), spotColor = mainColor.copy(alpha = 0.4f))
             .clickable { 
                 nodeCoords?.let { onNodeTap(it) }
                 onViewDetailClick()
             },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = onCardColor),
-        border = BorderStroke(1.dp, borderColor)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.5.dp, mainColor.copy(alpha = 0.3f))
     ) {
         Column(
             modifier = Modifier
-                .background(containerBrush)
-                .padding(16.dp), 
+                .background(gradientBrush)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            // Gender + Status badges
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Badge(containerColor = onCardColor, contentColor = mainColor) {
-                    Text(
-                        hewan.jenisKelamin.uppercase(),
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                Badge(
-                    containerColor = if (hewan.status.equals("HIDUP", true)) Color(0xFF4CAF50) else Color.Red,
-                    contentColor = Color.White
+            // â”€â”€ Badges Row â”€â”€
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Gender Badge
+                Surface(
+                    shape = RoundedCornerShape(100),
+                    color = Color.White.copy(alpha = 0.95f),
+                    shadowElevation = 2.dp
                 ) {
-                    Text(
-                        hewan.status.uppercase(),
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        fontWeight = FontWeight.Bold
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isJantan) Icons.Rounded.Male else Icons.Rounded.Female,
+                            contentDescription = null,
+                            tint = mainColor,
+                            modifier = Modifier.size(13.dp)
+                        )
+                        Text(
+                            text = hewan.jenisKelamin.uppercase(),
+                            color = mainColor,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
+                        )
+                    }
+                }
+
+                // Status Badge
+                Surface(
+                    shape = RoundedCornerShape(100),
+                    color = statusColor.copy(alpha = 0.9f),
+                    shadowElevation = 2.dp
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(5.dp)
+                                .clip(CircleShape)
+                                .background(Color.White.copy(alpha = 0.8f))
+                        )
+                        Text(
+                            text = hewan.status.uppercase(),
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Photo
+            // â”€â”€ Photo â”€â”€
             Box(
                 modifier = Modifier
-                    .padding(bottom = 12.dp)
-                    .size(90.dp)
+                    .size(84.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.2f))
-                    .border(2.dp, Color.White, CircleShape),
+                    .background(Color.White.copy(alpha = 0.15f))
+                    .border(2.5.dp, Color.White.copy(alpha = 0.6f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 if (hewan.fotoUri.isNotEmpty()) {
-                    // Check if it's a Base64 string
-                    val isBase64 = !hewan.fotoUri.startsWith("content:") && 
-                                   !hewan.fotoUri.startsWith("file:") && 
+                    val isBase64 = !hewan.fotoUri.startsWith("content:") &&
+                                   !hewan.fotoUri.startsWith("file:") &&
                                    (hewan.fotoUri.length > 500 || !hewan.fotoUri.startsWith("/"))
-                    
+
                     if (isBase64) {
-                        // Use custom Base64 decoder
                         val imageBitmap = com.example.zenfarm.utils.rememberBase64Image(hewan.fotoUri)
-                        
                         if (imageBitmap != null) {
                             androidx.compose.foundation.Image(
                                 bitmap = imageBitmap,
@@ -805,19 +859,18 @@ fun HewanNode(
                                 contentScale = ContentScale.Crop
                             )
                         } else {
-                            // Fallback to placeholder if decode fails
-                            androidx.compose.foundation.Image(
-                                painter = painterResource(id = com.example.zenfarm.R.drawable.ic_cow),
-                                contentDescription = "Placeholder",
-                                modifier = Modifier.size(48.dp)
+                            Icon(
+                                imageVector = Icons.Rounded.Pets,
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.5f),
+                                modifier = Modifier.size(36.dp)
                             )
                         }
                     } else {
-                        // Use Coil for file paths and URIs
                         val imageModel = remember(hewan.fotoUri) {
                             when {
                                 hewan.fotoUri.startsWith("/") -> java.io.File(hewan.fotoUri)
-                                hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:") -> 
+                                hewan.fotoUri.startsWith("content:") || hewan.fotoUri.startsWith("file:") ->
                                     android.net.Uri.parse(hewan.fotoUri)
                                 else -> hewan.fotoUri
                             }
@@ -834,72 +887,175 @@ fun HewanNode(
                         )
                     }
                 } else {
-                    Text("No Photo", color = Color.White, style = MaterialTheme.typography.bodySmall)
+                    Icon(
+                        imageVector = Icons.Rounded.Pets,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.4f),
+                        modifier = Modifier.size(36.dp)
+                    )
                 }
             }
 
-            Text(hewan.nama, style = MaterialTheme.typography.titleMedium, color = onCardColor)
-            Text("${hewan.hakPembagian}", color = onCardColor.copy(alpha = 0.8f))
+            Spacer(modifier = Modifier.height(10.dp))
 
-            val isEditable = hewan.status.equals("HIDUP", ignoreCase = true) || hewan.status.equals("SAKIT", ignoreCase = true)
-            // Rule: MATI, HILANG, DIPULANGKAN are NOT editable
-            val isActive = isEditable && !hewan.status.equals("MATI", true) && 
-                          !hewan.status.equals("HILANG", true) && 
-                          !hewan.status.equals("DIPULANGKAN", true)
-            
-            Spacer(modifier = Modifier.height(8.dp))
+            // â”€â”€ Name â”€
+            Text(
+                text = hewan.nama,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                fontSize = 16.sp
+            )
 
-            // ── Jual button – ONLY for Pengurus (Manager) ──
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // â”€â”€ Ownership Badge â”€â”€
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color.White.copy(alpha = 0.2f)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.VerifiedUser,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Text(
+                        text = hewan.hakPembagian,
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // â”€â”€ Action Buttons â”€â”€
+
+            // Jual button (Pengurus only)
             if (isPengurus) {
                 Button(
-                    onClick = onSellClick, 
-                    modifier = Modifier.fillMaxWidth(), 
+                    onClick = onSellClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp),
                     enabled = isActive,
+                    shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = com.example.zenfarm.ui.theme.FarmGreen,
+                        containerColor = Color(0xFF4CAF50),
+                        disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.3f),
                         contentColor = Color.White
-                    )
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
-                    Text("Jual")
+                    Icon(
+                        imageVector = Icons.Rounded.ShoppingCart,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        "Jual",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
+                    )
                 }
+                Spacer(modifier = Modifier.height(6.dp))
             }
 
-            // ── View Details – visible for both roles ──
-            Spacer(modifier = Modifier.height(4.dp))
+            // View Details (both roles)
             OutlinedButton(
-                onClick = onViewDetailClick, 
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, Color.White),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                onClick = onViewDetailClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(36.dp),
+                shape = RoundedCornerShape(10.dp),
+                border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.6f)),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color.White,
+                    disabledContentColor = Color.White.copy(alpha = 0.4f)
+                ),
+                contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
-                Text("View Details")
+                Icon(
+                    imageVector = Icons.Rounded.Info,
+                    contentDescription = null,
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    "Detail",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 13.sp
+                )
             }
 
-            // ── Modification actions – ONLY for Pengurus ──
-            if (isPengurus) {
-                if (hewan.jenisKelamin.equals("BETINA", ignoreCase = true)) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    val partnerText = if (hewan.pasanganId != null) "Ganti Pasangan" else "+ Tambah Pasangan"
-                    OutlinedButton(
-                        onClick = { navController.navigate("tambah_pasangan/$silsilahId?indukBetinaId=${hewan.hewanId}") },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = isActive,
-                        border = BorderStroke(1.dp, Color.White),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                    ) {
-                        Text(partnerText)
-                    }
+            // Modification actions (Pengurus only, Betina only)
+            if (isPengurus && isBetina) {
+                Spacer(modifier = Modifier.height(6.dp))
 
-                    Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedButton(
-                        onClick = onAddChildClick, 
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = isActive,
-                        border = BorderStroke(1.dp, Color.White),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                    ) {
-                        Text("+ Anak")
-                    }
+                val partnerText = if (hewan.pasanganId != null) "Ganti Pasangan" else "Tambah Pasangan"
+                OutlinedButton(
+                    onClick = { navController.navigate("tambah_pasangan/$silsilahId?indukBetinaId=${hewan.hewanId}") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp),
+                    enabled = isActive,
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.6f)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White,
+                        disabledContentColor = Color.White.copy(alpha = 0.4f)
+                    ),
+                    contentPadding = PaddingValues(horizontal = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Favorite,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        partnerText,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                OutlinedButton(
+                    onClick = onAddChildClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(36.dp),
+                    enabled = isActive,
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.6f)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White,
+                        disabledContentColor = Color.White.copy(alpha = 0.4f)
+                    ),
+                    contentPadding = PaddingValues(horizontal = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.AddCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        "Tambah Anak",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp
+                    )
                 }
             }
         }
@@ -929,7 +1085,7 @@ fun PartnerInfoDialog(female: Hewan, male: Hewan, onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("♀ Betina", fontWeight = FontWeight.Bold, color = Color(0xFFD81B60))
+                        Text("â™€ Betina", fontWeight = FontWeight.Bold, color = Color(0xFFD81B60))
                         Text("Nama: ${female.nama}")
                         Text("Status: ${female.status}")
                     }
@@ -941,7 +1097,7 @@ fun PartnerInfoDialog(female: Hewan, male: Hewan, onDismiss: () -> Unit) {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text("♂ Jantan", fontWeight = FontWeight.Bold, color = Color(0xFF1976D2))
+                        Text("â™‚ Jantan", fontWeight = FontWeight.Bold, color = Color(0xFF1976D2))
                         Text("Nama: ${male.nama}")
                         Text("Status: ${male.status}")
                     }
@@ -967,9 +1123,9 @@ fun PartnerInfoDialog(female: Hewan, male: Hewan, onDismiss: () -> Unit) {
     )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Animal Detail Dialog (Interactive with Status form)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun AnimalDetailDialog(
@@ -1010,7 +1166,7 @@ fun AnimalDetailDialog(
                         val imageBitmap = com.example.zenfarm.utils.rememberBase64Image(hewan.fotoUri)
                         
                         if (imageBitmap != null) {
-                            android.util.Log.d("AnimalDetailDialog", "✅ Image decoded successfully")
+                            android.util.Log.d("AnimalDetailDialog", "âœ… Image decoded successfully")
                             androidx.compose.foundation.Image(
                                 bitmap = imageBitmap,
                                 contentDescription = "Foto ${hewan.nama}",
@@ -1022,7 +1178,7 @@ fun AnimalDetailDialog(
                                 contentScale = ContentScale.Crop
                             )
                         } else {
-                            android.util.Log.e("AnimalDetailDialog", "❌ Image decode failed - showing placeholder")
+                            android.util.Log.e("AnimalDetailDialog", "âŒ Image decode failed - showing placeholder")
                             // Fallback to placeholder if decode fails
                             Box(
                                 modifier = Modifier
@@ -1130,15 +1286,15 @@ private fun DetailRow(label: String, value: String) {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Seller Contact Dialog (for Pemilik on "Jual" tap)
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun SellerContactDialog(hewanName: String, sellerUser: User?, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val hasEmail = sellerUser != null && sellerUser.email.isNotEmpty()
-    // User model has no phone field – future-proofed
+    // User model has no phone field â€“ future-proofed
     val hasPhone = false // No phone field in current User model
 
     AlertDialog(
@@ -1212,9 +1368,9 @@ fun SellerContactDialog(hewanName: String, sellerUser: User?, onDismiss: () -> U
     )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Extension for background grid pattern
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 fun Modifier.farmGridPattern(
     dotRadius: Float = 2f,
     spacing: Float = 60f,

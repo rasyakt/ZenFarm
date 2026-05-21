@@ -391,6 +391,14 @@ class FarmViewModel : ViewModel() {
 
             val allHewan = repository.getHewanBySilsilah(silsilahId)
 
+            // Validasi silsilah masih aktif
+            val silsilahCheck = repository.getSilsilahById(silsilahId)
+            if (silsilahCheck == null || silsilahCheck.status == "SELESAI") {
+                onError("Silsilah sudah selesai, tidak dapat menambah anak baru")
+                _isLoading.value = false
+                return@launch
+            }
+
             // Validasi Duplicate Anak
             if (allHewan.any { it.nama.equals(nama, ignoreCase = true) }) {
                 onError("Anak sudah terdaftar")
@@ -515,7 +523,15 @@ class FarmViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             _isLoading.value = true
-            
+
+            // Validasi silsilah masih aktif
+            val silsilahCheck = repository.getSilsilahById(silsilahId)
+            if (silsilahCheck == null || silsilahCheck.status == "SELESAI") {
+                onError("Silsilah sudah selesai, tidak dapat menambah pasangan baru")
+                _isLoading.value = false
+                return@launch
+            }
+
             val allHewan = repository.getHewanBySilsilah(silsilahId)
             val mother = allHewan.find { it.hewanId == indukBetinaId }
             if (mother == null || !mother.jenisKelamin.equals("BETINA", ignoreCase = true)) {
@@ -604,10 +620,15 @@ class FarmViewModel : ViewModel() {
     }
 
     // Role: Pengurus / Pemilik -> Hapus Hewan with cascading cleanup
-    fun hapusHewan(silsilahId: String, hewanId: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
+    fun hapusHewan(silsilahId: String, hewanId: String, userRole: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                if (userRole != "Pengurus") {
+                    onError("Hanya Pengurus yang dapat menghapus hewan")
+                    _isLoading.value = false
+                    return@launch
+                }
                 val allHewan = repository.getHewanBySilsilah(silsilahId)
                 val target = allHewan.find { it.hewanId == hewanId }
 
@@ -668,30 +689,6 @@ class FarmViewModel : ViewModel() {
         }
     }
 
-    // Trigger Evaluation
-
-    private fun checkStopSilsilah(children: List<Hewan>): Boolean {
-        // Lineage stops only when there are no living or sick females left to reproduce
-        val activeFemales = children.count { 
-            it.jenisKelamin.equals("BETINA", ignoreCase = true) && 
-            (it.status.equals("HIDUP", true) || it.status.equals("SAKIT", true)) 
-        }
-        return activeFemales == 0
-    }
-
-    fun updateHewanStatus(hewanId: String, newStatus: String) {
-        viewModelScope.launch {
-            val allHewan = _hewans.value
-            val target = allHewan.find { it.hewanId == hewanId }
-            if (target != null) {
-                repository.updateHewan(target.copy(status = newStatus.uppercase()))
-                fetchHewanSilsilah(target.silsilahId)
-                // Evaluate lineage death if status might terminate the lineage
-                evalLineageEndTrigger(target.silsilahId)
-            }
-        }
-    }
-
     fun fetchRiwayatPenjualan(userId: String, role: String) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -719,6 +716,7 @@ class FarmViewModel : ViewModel() {
         hewan: Hewan, 
         hargaJual: Int, 
         pengurusId: String, 
+        userRole: String,
         buyerName: String, 
         buyerPhone: String,
         onSuccess: (Boolean) -> Unit = {},
@@ -727,6 +725,11 @@ class FarmViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                if (userRole != "Pengurus") {
+                    onError("Hanya Pengurus yang dapat menjual hewan")
+                    _isLoading.value = false
+                    return@launch
+                }
                 val isDirect = hewan.ownershipSource.contains("PENGURUS", ignoreCase = true)
                 
                 if (isDirect) {
@@ -793,10 +796,15 @@ class FarmViewModel : ViewModel() {
         }
     }
 
-    fun acceptPenjualan(penjualan: Penjualan, ownerId: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
+    fun acceptPenjualan(penjualan: Penjualan, ownerId: String, userRole: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                if (userRole != "Pemilik") {
+                    onError("Hanya Pemilik yang dapat menyetujui penjualan")
+                    _isLoading.value = false
+                    return@launch
+                }
                 repository.db.runTransaction { transaction ->
                     val penjualanRef = repository.db.collection("penjualan").document(penjualan.penjualanId)
                     val hewanRef = repository.db.collection("hewan").document(penjualan.hewanId)
@@ -876,10 +884,15 @@ class FarmViewModel : ViewModel() {
     }
 
     // Pemilik rejects a pending sale with reason
-    fun rejectPenjualan(penjualan: Penjualan, alasan: String, ownerId: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
+    fun rejectPenjualan(penjualan: Penjualan, alasan: String, ownerId: String, userRole: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                if (userRole != "Pemilik") {
+                    onError("Hanya Pemilik yang dapat menolak penjualan")
+                    _isLoading.value = false
+                    return@launch
+                }
                 val updated = penjualan.copy(status = "REJECTED", alasanTolak = alasan)
                 repository.updatePenjualan(updated)
                 // Refresh pending list
@@ -892,10 +905,15 @@ class FarmViewModel : ViewModel() {
             }
         }
     }
-    fun updateStatusHewan(silsilahId: String, hewanId: String, newStatus: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
+    fun updateStatusHewan(silsilahId: String, hewanId: String, newStatus: String, userRole: String, onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                if (userRole != "Pengurus") {
+                    onError("Hanya Pengurus yang dapat mengubah status hewan")
+                    _isLoading.value = false
+                    return@launch
+                }
                 val hewanRef = repository.db.collection("hewan").document(hewanId)
                 repository.db.runTransaction { transaction ->
                     transaction.update(hewanRef, "status", newStatus)
@@ -923,7 +941,7 @@ class FarmViewModel : ViewModel() {
                 
                 val anyActiveFemaleWithPartner = allHewan.any { 
                     it.jenisKelamin.equals("BETINA", true) && 
-                    it.status.equals("HIDUP", true) && 
+                    (it.status.equals("HIDUP", true) || it.status.equals("SAKIT", true)) && 
                     it.pasanganId != null 
                 }
                 
