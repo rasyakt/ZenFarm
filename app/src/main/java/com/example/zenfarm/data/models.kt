@@ -16,8 +16,7 @@ data class Silsilah(
     val namaSilsilah: String = "",
     val ownerId: String = "",
     val pengurusId: String = "",
-    val status: String = "GLOBAL", // GLOBAL, aktif, selesai
-    val active: Boolean = true,
+    val status: String = "GLOBAL", // GLOBAL, AKTIF, SELESAI
     val createdAt: Timestamp = Timestamp.now(),
     val updatedAt: Timestamp = Timestamp.now()
 )
@@ -29,7 +28,7 @@ data class Hewan(
     val tanggalLahir: Timestamp = Timestamp.now(),
     val jenisKelamin: String = "", // "Jantan", "Betina"
     val harga: Int = 0,
-    val status: String = "HIDUP", // HIDUP, MATI, DIJUAL
+    val status: String = "HIDUP", // HIDUP, MATI, TERJUAL
     val indukBetinaId: String? = null,
     val indukJantanId: String? = null,
     val parentId: String? = null, // To enforce tree structure

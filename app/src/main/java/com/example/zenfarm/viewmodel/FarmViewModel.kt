@@ -21,7 +21,7 @@ import java.time.ZoneId
 import kotlin.math.ceil
 
 class FarmViewModel : ViewModel() {
-    private val repository = FarmRepository()
+    val repository = FarmRepository()
 
     private val _silsilahs = MutableStateFlow<List<Silsilah>>(emptyList())
     val silsilahs: StateFlow<List<Silsilah>> = _silsilahs.asStateFlow()
@@ -98,16 +98,26 @@ class FarmViewModel : ViewModel() {
     fun fetchPendingPenjualan(ownerId: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            val fetched = repository.getPenjualanPendingByOwner(ownerId)
-            val activeList = mutableListOf<Penjualan>()
-            
-            for (p in fetched) {
-                if (!autoCancelIfExpired(p)) {
-                    activeList.add(p)
+            try {
+                val fetched = repository.getPenjualanPendingByOwner(ownerId)
+                val activeList = mutableListOf<Penjualan>()
+
+                for (p in fetched) {
+                    try {
+                        if (!autoCancelIfExpired(p)) {
+                            activeList.add(p)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        activeList.add(p)
+                    }
                 }
+                _pendingPenjualans.value = activeList
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
             }
-            _pendingPenjualans.value = activeList
-            _isLoading.value = false
         }
     }
 
@@ -295,7 +305,7 @@ class FarmViewModel : ViewModel() {
                 onError("Hewan sudah diklaim")
                 return@launch
             }
-            val updateSilsilah = silsilah.copy(pengurusId = pengurusId, status = "aktif")
+            val updateSilsilah = silsilah.copy(pengurusId = pengurusId, status = "AKTIF")
             repository.updateSilsilah(updateSilsilah)
             fetchGlobalSilsilahs()
             onSuccess()
@@ -340,7 +350,7 @@ class FarmViewModel : ViewModel() {
             }
         }
 
-        return if (available.isEmpty()) listOf("Pemilik", "Pengurus") else available
+        return available
     }
 
     // Opsi Penghitung Usia
@@ -494,10 +504,11 @@ class FarmViewModel : ViewModel() {
                 updatedAt = Timestamp.now()
             )
             
-            repository.addHewan(newAnak)
+            val addedHewanId = repository.addHewan(newAnak)
+            val savedAnak = newAnak.copy(hewanId = addedHewanId)
             
             // Fast UI update (local state)
-            _hewans.value = (_hewans.value + newAnak).sortedBy { it.tanggalLahir }
+            _hewans.value = (_hewans.value + savedAnak).sortedBy { it.tanggalLahir }
             
             fetchHewanSilsilah(silsilahId)
             evalLineageEndTrigger(silsilahId)
@@ -605,7 +616,7 @@ class FarmViewModel : ViewModel() {
                     }
                     
                     if (silsilah != null && silsilah.status == "SELESAI") {
-                        transaction.update(silsilahRef, "status", "aktif")
+                        transaction.update(silsilahRef, "status", "AKTIF")
                     }
                 }.await()
                 
@@ -624,8 +635,8 @@ class FarmViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                if (userRole != "Pengurus") {
-                    onError("Hanya Pengurus yang dapat menghapus hewan")
+                if (userRole != "Pengurus" && userRole != "Pemilik") {
+                    onError("Hanya Pengurus atau Pemilik yang dapat menghapus hewan")
                     _isLoading.value = false
                     return@launch
                 }
@@ -873,6 +884,11 @@ class FarmViewModel : ViewModel() {
                 // Refresh pending list and history for both
                 fetchPendingPenjualan(ownerId)
                 fetchRiwayatPenjualan(ownerId, "Pemilik")
+                val pengurusId = penjualan.userId
+                if (pengurusId.isNotEmpty()) {
+                    fetchPendingPenjualan(pengurusId)
+                    fetchRiwayatPenjualan(pengurusId, "Pengurus")
+                }
                 onSuccess()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -949,7 +965,7 @@ class FarmViewModel : ViewModel() {
                     repository.db.runTransaction { transaction ->
                         val snap = transaction.get(silsilahRef)
                         val silsilah = snap.toObject(Silsilah::class.java)
-                        if (silsilah != null && silsilah.status == "aktif") {
+                        if (silsilah != null && silsilah.status == "AKTIF") {
                             transaction.update(silsilahRef, "status", "SELESAI")
                         }
                         null

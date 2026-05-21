@@ -130,8 +130,8 @@ fun SilsilahCanvasScreen(
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
     var contentSize by remember { mutableStateOf(IntSize.Zero) }
 
-    // Repository for fetching seller info
-    val repository = remember { FarmRepository() }
+    // Repository for fetching seller info (use ViewModel's instance)
+    val repository = farmViewModel.repository
 
     LaunchedEffect(silsilahId) {
         farmViewModel.fetchHewanSilsilah(silsilahId)
@@ -296,14 +296,15 @@ fun SilsilahCanvasScreen(
         }
 
         // â”€â”€ Detail & Status Dialog (Both roles) â”€â”€
-        if (hewanToView != null) {
+        hewanToView?.let { h ->
+            val hId = h.hewanId
             AnimalDetailDialog(
-                hewan = hewanToView!!,
+                hewan = h,
                 isPengurus = isPengurus,
                 onUpdateStatus = { newStatus ->
                     farmViewModel.updateStatusHewan(
                         silsilahId = silsilahId,
-                        hewanId = hewanToView!!.hewanId,
+                        hewanId = hId,
                         newStatus = newStatus,
                         userRole = user?.role ?: "",
                         onSuccess = { hewanToView = null }
@@ -316,11 +317,15 @@ fun SilsilahCanvasScreen(
         // ─── Sell Dialog (Pengurus flow – with confirmation + margin) ───
         if (hewanToSell != null && isPengurus) {
             var confirmStep by remember { mutableIntStateOf(1) }
+            val resetSellForm = {
+                hewanToSell = null; confirmStep = 1
+                sellPriceText = ""; buyerNameText = ""; buyerPhoneText = ""
+            }
             
             if (confirmStep == 1) {
                 // Step 1: Confirmation
                 AlertDialog(
-                    onDismissRequest = { hewanToSell = null; confirmStep = 1 },
+                    onDismissRequest = resetSellForm,
                     shape = RoundedCornerShape(24.dp),
                     containerColor = Color.White,
                     icon = {
@@ -405,7 +410,7 @@ fun SilsilahCanvasScreen(
                     },
                     dismissButton = {
                         OutlinedButton(
-                            onClick = { hewanToSell = null; confirmStep = 1 },
+                            onClick = resetSellForm,
                             shape = RoundedCornerShape(12.dp),
                             border = BorderStroke(1.5.dp, Color(0xFFCBD5E1))
                         ) { 
@@ -420,7 +425,7 @@ fun SilsilahCanvasScreen(
                 val margin = hargaJualInt - hargaModal
                 
                 AlertDialog(
-                    onDismissRequest = { hewanToSell = null; confirmStep = 1 },
+                    onDismissRequest = resetSellForm,
                     shape = RoundedCornerShape(24.dp),
                     containerColor = Color.White,
                     title = { 
@@ -550,11 +555,7 @@ fun SilsilahCanvasScreen(
                                         )
                                     }
                                 }
-                                hewanToSell = null
-                                confirmStep = 1
-                                buyerNameText = ""
-                                buyerPhoneText = ""
-                                sellPriceText = ""
+                                resetSellForm()
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
                             shape = RoundedCornerShape(12.dp)
@@ -1735,7 +1736,7 @@ fun SellerContactDialog(hewanName: String, sellerUser: User?, onDismiss: () -> U
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         DetailCardRow(Icons.Rounded.Person, "Nama Pengurus", sellerUser?.name ?: "Tidak tersedia", Color(0xFF0284C7))
-                        DetailCardRow(Icons.Rounded.Call, "Email Pengurus", sellerUser?.email ?: "Tidak tersedia", Color(0xFF0F766E))
+                        DetailCardRow(Icons.Default.Email, "Email Pengurus", sellerUser?.email ?: "Tidak tersedia", Color(0xFF0F766E))
                     }
                 }
 

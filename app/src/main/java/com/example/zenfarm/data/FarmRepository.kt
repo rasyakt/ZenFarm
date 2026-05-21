@@ -27,22 +27,12 @@ class FarmRepository {
     }
 
     suspend fun getUserById(userId: String): User? {
-        val snapshot = db.collection("users")
-            .whereEqualTo("userId", userId)
-            .get()
-            .await()
-        return if (snapshot.isEmpty) null else snapshot.documents[0].toObject(User::class.java)
+        val doc = db.collection("users").document(userId).get().await()
+        return doc.toObject(User::class.java)
     }
     
     suspend fun updateUserPassword(userId: String, newPassword: String) {
-        val snapshot = db.collection("users")
-            .whereEqualTo("userId", userId)
-            .get()
-            .await()
-        if (!snapshot.isEmpty) {
-            val docId = snapshot.documents[0].id
-            db.collection("users").document(docId).update("password", newPassword).await()
-        }
+        db.collection("users").document(userId).update("password", newPassword).await()
     }
 
     suspend fun getSilsilahById(silsilahId: String): Silsilah? {
@@ -87,10 +77,12 @@ class FarmRepository {
     }
 
     // Hewan
-    suspend fun addHewan(hewan: Hewan) {
+    suspend fun addHewan(hewan: Hewan): String {
         val ref = db.collection("hewan").document()
-        val hewanWithId = hewan.copy(hewanId = ref.id)
+        val hewanId = ref.id
+        val hewanWithId = hewan.copy(hewanId = hewanId)
         ref.set(hewanWithId).await()
+        return hewanId
     }
 
     suspend fun getHewanBySilsilah(silsilahId: String): List<Hewan> {
@@ -129,16 +121,19 @@ class FarmRepository {
     }
 
     suspend fun getPenjualanPendingByOwner(ownerId: String): List<Penjualan> {
-        // Find silsilahs owned by owner first
         val silsilahs = getSilsilahByOwner(ownerId).map { it.silsilahId }
         if (silsilahs.isEmpty()) return emptyList()
         
-        val snapshot = db.collection("penjualan")
-            .whereIn("silsilahId", silsilahs)
-            .whereEqualTo("status", "PENDING")
-            .get()
-            .await()
-        return snapshot.documents.mapNotNull { it.toObject(Penjualan::class.java) }
+        val all = mutableListOf<Penjualan>()
+        silsilahs.chunked(10).forEach { chunk ->
+            val snapshot = db.collection("penjualan")
+                .whereIn("silsilahId", chunk)
+                .whereEqualTo("status", "PENDING")
+                .get()
+                .await()
+            all.addAll(snapshot.documents.mapNotNull { it.toObject(Penjualan::class.java) })
+        }
+        return all
     }
 
     suspend fun getPenjualanRiwayat(userId: String, role: String): List<Penjualan> {
@@ -147,13 +142,15 @@ class FarmRepository {
                 val silsilahs = getSilsilahByOwner(userId).map { it.silsilahId }
                 if (silsilahs.isEmpty()) return emptyList()
                 
-                val snapshot = db.collection("penjualan")
-                    .whereIn("silsilahId", silsilahs)
-                    .get()
-                    .await()
-                
-                snapshot.documents.mapNotNull { it.toObject(Penjualan::class.java) }
-                    .filter { it.status != "PENDING" }
+                val all = mutableListOf<Penjualan>()
+                silsilahs.chunked(10).forEach { chunk ->
+                    val snapshot = db.collection("penjualan")
+                        .whereIn("silsilahId", chunk)
+                        .get()
+                        .await()
+                    all.addAll(snapshot.documents.mapNotNull { it.toObject(Penjualan::class.java) })
+                }
+                all.filter { it.status != "PENDING" }
             } else {
                 val snapshot = db.collection("penjualan")
                     .whereEqualTo("userId", userId)
