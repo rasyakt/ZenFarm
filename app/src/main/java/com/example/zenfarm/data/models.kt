@@ -54,5 +54,7 @@ data class Penjualan(
     val buyerPhone: String = "",
     val status: String = "PENDING", // PENDING, SOLD, REJECTED, AUTO_CANCEL
     val alasanTolak: String = "", // Reason for rejection by Pemilik
+    val ownershipSource: String = "", // Snapshot: "PEMILIK", "PENGURUS", "BAGI_DUA"
+    val hakPembagian: String = "", // Snapshot: "Pemilik", "Pengurus", "Bagi Dua"
     val createdAt: Timestamp = Timestamp.now()
 )

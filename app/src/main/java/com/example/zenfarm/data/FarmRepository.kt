@@ -136,6 +136,20 @@ class FarmRepository {
         return all
     }
 
+    suspend fun getPenjualanByHewan(hewanId: String, status: String): List<Penjualan> {
+        return try {
+            val snapshot = db.collection("penjualan")
+                .whereEqualTo("hewanId", hewanId)
+                .whereEqualTo("status", status)
+                .get()
+                .await()
+            snapshot.documents.mapNotNull { it.toObject(Penjualan::class.java) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
     suspend fun getPenjualanRiwayat(userId: String, role: String): List<Penjualan> {
         return try {
             if (role == "Pemilik") {

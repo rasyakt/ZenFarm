@@ -767,6 +767,8 @@ class FarmViewModel : ViewModel() {
                             buyerName = buyerName,
                             buyerPhone = buyerPhone,
                             status = "SOLD",
+                            ownershipSource = hewan.ownershipSource,
+                            hakPembagian = hewan.hakPembagian,
                             createdAt = Timestamp.now()
                         )
                         transaction.set(penjualanRef, sale)
@@ -783,6 +785,12 @@ class FarmViewModel : ViewModel() {
                     fetchRiwayatPenjualan(pengurusId, "Pengurus")
                 } else {
                     // Penjualan Titipan (PEMILIK / BAGI_DUA) - Perlu Pending Approval
+                    val existingPending = repository.getPenjualanByHewan(hewan.hewanId, "PENDING")
+                    if (existingPending.isNotEmpty()) {
+                        onError("Hewan ini sudah memiliki pengajuan penjualan yang menunggu persetujuan")
+                        _isLoading.value = false
+                        return@launch
+                    }
                     val j = Penjualan(
                         silsilahId = hewan.silsilahId,
                         hewanId = hewan.hewanId,
@@ -794,6 +802,8 @@ class FarmViewModel : ViewModel() {
                         buyerName = buyerName,
                         buyerPhone = buyerPhone,
                         status = "PENDING",
+                        ownershipSource = hewan.ownershipSource,
+                        hakPembagian = hewan.hakPembagian,
                         createdAt = Timestamp.now()
                     )
                     repository.createPenjualan(j)
@@ -830,11 +840,14 @@ class FarmViewModel : ViewModel() {
                     val hewanSnap = transaction.get(hewanRef)
                     val hewan = hewanSnap.toObject(Hewan::class.java)
                         ?: throw Exception("Data hewan tidak ditemukan")
+                    if (hewan.status != "HIDUP") {
+                        throw Exception("Hewan sudah tidak tersedia")
+                    }
 
                     val penjualanSnap = transaction.get(penjualanRef)
                     val currentStatus = penjualanSnap.getString("status")
-                    if (currentStatus == "SOLD") {
-                        throw Exception("Idempotent: Transaksi sudah diproses sebelumnya")
+                    if (currentStatus != "PENDING") {
+                        throw Exception("Transaksi sudah diproses sebelumnya")
                     }
                     
                     val ownerIdFinal = silsilah.ownerId
@@ -858,7 +871,8 @@ class FarmViewModel : ViewModel() {
                     
                     // Logic Pembagian berdasarkan ownershipSource
                     val isPengurusOwned = hewan.ownershipSource.contains("PENGURUS", ignoreCase = true)
-                    val isPemilikOwned = hewan.ownershipSource.equals("PEMILIK", ignoreCase = true)
+                    val isPemilikOwned = hewan.ownershipSource.equals("PEMILIK", ignoreCase = true) ||
+                            hewan.ownershipSource.equals("MUTLAK_PEMILIK", ignoreCase = true)
                     
                     if (isPengurusOwned) {
                         // Just in case a PENGURUS animal enters pending (though UI should prevent it)
@@ -872,7 +886,8 @@ class FarmViewModel : ViewModel() {
                         // Logic Titipan (BAGI_DUA) - Bagi hasil 50/50
                         if (profit > 0) {
                             val profitShare = profit / 2
-                            ownerAdd = penjualan.hargaModal + profitShare
+                            val remainder = profit - (profitShare * 2)
+                            ownerAdd = penjualan.hargaModal + profitShare + remainder
                             pengurusAdd = profitShare
                         } else {
                             // Rugi atau balik modal, Pemilik ambil apa adanya, Pengurus 0
