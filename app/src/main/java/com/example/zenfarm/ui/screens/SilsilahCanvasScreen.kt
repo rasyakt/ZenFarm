@@ -39,6 +39,8 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -74,6 +76,7 @@ import com.example.zenfarm.data.Hewan
 import com.example.zenfarm.data.User
 import com.example.zenfarm.viewmodel.AuthViewModel
 import com.example.zenfarm.viewmodel.FarmViewModel
+import com.example.zenfarm.ui.theme.standardTextFieldColors
 import kotlinx.coroutines.launch
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -469,15 +472,16 @@ fun SilsilahCanvasScreen(
                                 }
                             }
                             
-                            OutlinedTextField(
-                                value = sellPriceText,
-                                onValueChange = { if (it.all { char -> char.isDigit() }) sellPriceText = it },
-                                label = { Text("Harga Jual") },
-                                leadingIcon = { Icon(Icons.Rounded.Payments, contentDescription = null, tint = Color(0xFF2E7D32)) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp)
-                            )
+                             OutlinedTextField(
+                                 value = sellPriceText,
+                                 onValueChange = { if (it.all { char -> char.isDigit() }) sellPriceText = it },
+                                 label = { Text("Harga Jual") },
+                                 leadingIcon = { Icon(Icons.Rounded.Payments, contentDescription = null, tint = Color(0xFF2E7D32)) },
+                                 modifier = Modifier.fillMaxWidth(),
+                                 singleLine = true,
+                                 shape = RoundedCornerShape(12.dp),
+                                 colors = standardTextFieldColors()
+                             )
                             
                             // Margin display
                             if (sellPriceText.isNotBlank() && hargaJualInt > 0) {
@@ -511,26 +515,28 @@ fun SilsilahCanvasScreen(
                                 }
                             }
                             
-                            OutlinedTextField(
-                                value = buyerNameText,
-                                onValueChange = { buyerNameText = it },
-                                label = { Text("Nama Pembeli") },
-                                leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Gray) },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            
-                            OutlinedTextField(
-                                value = buyerPhoneText,
-                                onValueChange = { buyerPhoneText = it },
-                                label = { Text("Telepon Pembeli") },
-                                leadingIcon = { Icon(Icons.Rounded.Call, contentDescription = null, tint = Color.Gray) },
-                                placeholder = { Text("08xxx...") },
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                shape = RoundedCornerShape(12.dp)
-                            )
+                             OutlinedTextField(
+                                 value = buyerNameText,
+                                 onValueChange = { buyerNameText = it },
+                                 label = { Text("Nama Pembeli") },
+                                 leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null, tint = Color.Gray) },
+                                 modifier = Modifier.fillMaxWidth(),
+                                 singleLine = true,
+                                 shape = RoundedCornerShape(12.dp),
+                                 colors = standardTextFieldColors()
+                             )
+                             
+                             OutlinedTextField(
+                                 value = buyerPhoneText,
+                                 onValueChange = { buyerPhoneText = it },
+                                 label = { Text("Telepon Pembeli") },
+                                 leadingIcon = { Icon(Icons.Rounded.Call, contentDescription = null, tint = Color.Gray) },
+                                 placeholder = { Text("08xxx...") },
+                                 modifier = Modifier.fillMaxWidth(),
+                                 singleLine = true,
+                                 shape = RoundedCornerShape(12.dp),
+                                 colors = standardTextFieldColors()
+                             )
                         }
                     },
                     confirmButton = {
@@ -1531,56 +1537,50 @@ fun AnimalDetailDialog(
                         fontWeight = FontWeight.Bold, 
                         style = MaterialTheme.typography.titleSmall,
                         color = Color(0xFF2C3E50),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
                     
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        statusOptions.forEach { statusOpt ->
-                            val isSelected = selectedStatus == statusOpt
-                            val optionColor = when (statusOpt) {
-                                "HIDUP" -> Color(0xFF2E7D32)
-                                "SAKIT" -> Color(0xFFE65100)
-                                "MATI" -> Color(0xFFC62828)
-                                "DIPULANGKAN" -> Color(0xFF6A1B9A)
-                                "HILANG" -> Color(0xFF37474F)
-                                else -> Color.Gray
-                            }
-                            
-                            val chipBg = if (isSelected) optionColor.copy(alpha = 0.15f) else Color(0xFFF1F5F9)
-                            val chipBorder = if (isSelected) BorderStroke(1.5.dp, optionColor) else BorderStroke(1.dp, Color(0xFFE2E8F0))
-                            val chipTextColor = if (isSelected) optionColor else Color(0xFF475569)
-
-                            Surface(
-                                modifier = Modifier
-                                    .clickable { selectedStatus = statusOpt }
-                                    .clip(RoundedCornerShape(12.dp)),
-                                color = chipBg,
-                                border = chipBorder
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(8.dp)
-                                            .clip(CircleShape)
-                                            .background(optionColor)
-                                    )
+                    val statusChipData = listOf(
+                        Triple("HIDUP", Icons.Rounded.CheckCircle, Color(0xFF2E7D32)),
+                        Triple("SAKIT", Icons.Rounded.Warning, Color(0xFFE65100)),
+                        Triple("MATI", Icons.Filled.Close, Color(0xFFC62828)),
+                        Triple("DIPULANGKAN", Icons.AutoMirrored.Rounded.ArrowBack, Color(0xFF6A1B9A)),
+                        Triple("HILANG", Icons.Rounded.SearchOff, Color(0xFF37474F))
+                    )
+                    
+                    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        statusChipData.forEach { (label, icon, color) ->
+                            val isSelected = selectedStatus == label
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { selectedStatus = label },
+                                label = { 
                                     Text(
-                                        text = statusOpt,
-                                        style = MaterialTheme.typography.labelLarge,
+                                        text = label,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                        color = chipTextColor
+                                        color = if (isSelected) Color.White else Color(0xFF475569)
+                                    ) 
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = null,
+                                        tint = if (isSelected) Color.White else color,
+                                        modifier = Modifier.size(18.dp)
                                     )
-                                }
-                            }
+                                },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = color,
+                                    selectedLabelColor = Color.White,
+                                    containerColor = Color(0xFFF8FAFC),
+                                    labelColor = Color(0xFF475569),
+                                    selectedLeadingIconColor = Color.White,
+                                    iconColor = color
+                                ),
+                                border = if (isSelected) null else BorderStroke(1.5.dp, Color(0xFFE2E8F0)),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))

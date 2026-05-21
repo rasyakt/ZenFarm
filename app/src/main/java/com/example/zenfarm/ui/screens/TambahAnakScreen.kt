@@ -45,6 +45,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.zenfarm.viewmodel.FarmViewModel
+import com.example.zenfarm.ui.theme.standardTextFieldColors
+import com.example.zenfarm.ui.theme.CardWhite
+import com.example.zenfarm.ui.theme.TextSecondary
+import com.example.zenfarm.ui.theme.FarmGreen
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
@@ -133,26 +137,28 @@ fun TambahAnakScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    OutlinedTextField(
-                        value = nama,
-                        onValueChange = { nama = it },
-                        label = { Text("Nama Anak") },
-                        leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isLoading,
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    
-                    OutlinedTextField(
-                        value = tanggalLahir,
-                        onValueChange = { tanggalLahir = it },
-                        label = { Text("Tanggal Lahir") },
-                        placeholder = { Text("YYYY-MM-DD") },
-                        leadingIcon = { Icon(Icons.Rounded.CheckCircle, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isLoading,
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                     OutlinedTextField(
+                         value = nama,
+                         onValueChange = { nama = it },
+                         label = { Text("Nama Anak") },
+                         leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                         modifier = Modifier.fillMaxWidth(),
+                         enabled = !isLoading,
+                         shape = RoundedCornerShape(12.dp),
+                         colors = standardTextFieldColors()
+                     )
+                     
+                     OutlinedTextField(
+                         value = tanggalLahir,
+                         onValueChange = { tanggalLahir = it },
+                         label = { Text("Tanggal Lahir") },
+                         placeholder = { Text("YYYY-MM-DD") },
+                         leadingIcon = { Icon(Icons.Rounded.CheckCircle, contentDescription = null) },
+                         modifier = Modifier.fillMaxWidth(),
+                         enabled = !isLoading,
+                         shape = RoundedCornerShape(12.dp),
+                         colors = standardTextFieldColors()
+                     )
 
                     Column {
                         Text("Jenis Kelamin", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
@@ -201,30 +207,37 @@ fun TambahAnakScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    OutlinedTextField(
-                        value = harga,
-                        onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
-                        label = { Text("Harga Modal (Rp)") },
-                        leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isLoading,
-                        shape = RoundedCornerShape(12.dp)
-                    )
+                     OutlinedTextField(
+                         value = harga,
+                         onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
+                         label = { Text("Harga Modal (Rp)") },
+                         leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
+                         modifier = Modifier.fillMaxWidth(),
+                         enabled = !isLoading,
+                         shape = RoundedCornerShape(12.dp),
+                         colors = standardTextFieldColors()
+                     )
 
-                    Column {
-                        Text("Hak Pembagian", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            availableHakOptions.forEach { option ->
-                                FilterChip(
-                                    selected = hakPembagian == option,
-                                    onClick = { hakPembagian = option },
-                                    label = { Text(option.replace("_", " ")) },
-                                    enabled = !isLoading && availableHakOptions.size > 1,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
-                            }
-                        }
-                    }
+                     Column {
+                         Text("Hak Pembagian", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
+                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                             availableHakOptions.forEach { option ->
+                                 FilterChip(
+                                     selected = hakPembagian == option,
+                                     onClick = { hakPembagian = option },
+                                     label = { Text(option.replace("_", " ")) },
+                                     enabled = !isLoading && availableHakOptions.size > 1,
+                                     shape = RoundedCornerShape(8.dp),
+                                     colors = FilterChipDefaults.filterChipColors(
+                                         containerColor = CardWhite,
+                                         labelColor = TextSecondary,
+                                         selectedContainerColor = FarmGreen,
+                                         selectedLabelColor = Color.White
+                                     )
+                                 )
+                             }
+                         }
+                     }
                 }
             }
 
@@ -480,25 +493,27 @@ fun TambahAnakDialog(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            OutlinedTextField(
-                                value = nama,
-                                onValueChange = { nama = it },
-                                label = { Text("Nama Anak") },
-                                leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = !isLoading,
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            OutlinedTextField(
-                                value = tanggalLahir,
-                                onValueChange = { tanggalLahir = it },
-                                label = { Text("Tanggal Lahir") },
-                                placeholder = { Text("YYYY-MM-DD") },
-                                leadingIcon = { Icon(Icons.Rounded.CheckCircle, contentDescription = null) },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = !isLoading,
-                                shape = RoundedCornerShape(12.dp)
-                            )
+                             OutlinedTextField(
+                                 value = nama,
+                                 onValueChange = { nama = it },
+                                 label = { Text("Nama Anak") },
+                                 leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                                 modifier = Modifier.fillMaxWidth(),
+                                 enabled = !isLoading,
+                                 shape = RoundedCornerShape(12.dp),
+                                 colors = standardTextFieldColors()
+                             )
+                             OutlinedTextField(
+                                 value = tanggalLahir,
+                                 onValueChange = { tanggalLahir = it },
+                                 label = { Text("Tanggal Lahir") },
+                                 placeholder = { Text("YYYY-MM-DD") },
+                                 leadingIcon = { Icon(Icons.Rounded.CheckCircle, contentDescription = null) },
+                                 modifier = Modifier.fillMaxWidth(),
+                                 enabled = !isLoading,
+                                 shape = RoundedCornerShape(12.dp),
+                                 colors = standardTextFieldColors()
+                             )
                             Column {
                                 Text("Jenis Kelamin", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -537,29 +552,36 @@ fun TambahAnakDialog(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            OutlinedTextField(
-                                value = harga,
-                                onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
-                                label = { Text("Harga Modal (Rp)") },
-                                leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
-                                modifier = Modifier.fillMaxWidth(),
-                                enabled = !isLoading,
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            Column {
-                                Text("Hak Pembagian", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
-                                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    availableHakOptions.forEach { option ->
-                                        FilterChip(
-                                            selected = hakPembagian == option,
-                                            onClick = { hakPembagian = option },
-                                            label = { Text(option.replace("_", " ")) },
-                                            enabled = !isLoading && availableHakOptions.size > 1,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )
-                                    }
-                                }
-                            }
+                             OutlinedTextField(
+                                 value = harga,
+                                 onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
+                                 label = { Text("Harga Modal (Rp)") },
+                                 leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
+                                 modifier = Modifier.fillMaxWidth(),
+                                 enabled = !isLoading,
+                                 shape = RoundedCornerShape(12.dp),
+                                 colors = standardTextFieldColors()
+                             )
+                             Column {
+                                 Text("Hak Pembagian", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
+                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                     availableHakOptions.forEach { option ->
+                                         FilterChip(
+                                             selected = hakPembagian == option,
+                                             onClick = { hakPembagian = option },
+                                             label = { Text(option.replace("_", " ")) },
+                                             enabled = !isLoading && availableHakOptions.size > 1,
+                                             shape = RoundedCornerShape(8.dp),
+                                             colors = FilterChipDefaults.filterChipColors(
+                                                 containerColor = CardWhite,
+                                                 labelColor = TextSecondary,
+                                                 selectedContainerColor = FarmGreen,
+                                                 selectedLabelColor = Color.White
+                                             )
+                                         )
+                                     }
+                                 }
+                             }
                         }
                     }
 

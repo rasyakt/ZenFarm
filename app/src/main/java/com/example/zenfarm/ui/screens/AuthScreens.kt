@@ -15,6 +15,8 @@ import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material.icons.rounded.Engineering
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.zenfarm.R
@@ -39,6 +42,7 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     
     val error by viewModel.error.collectAsState()
     val loading by viewModel.loading.collectAsState()
@@ -127,7 +131,16 @@ fun LoginScreen(
                         leadingIcon = {
                             Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Password Icon", tint = FarmGreen)
                         },
-                        visualTransformation = PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                                    contentDescription = if (passwordVisible) "Sembunyikan password" else "Tampilkan password",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
@@ -222,6 +235,7 @@ fun RegisterScreen(
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var role by remember { mutableStateOf("Pemilik") }
     
     val error by viewModel.error.collectAsState()
@@ -324,7 +338,16 @@ fun RegisterScreen(
                         leadingIcon = {
                             Icon(imageVector = Icons.Rounded.Lock, contentDescription = "Password Icon", tint = FarmGreen)
                         },
-                        visualTransformation = PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(
+                                    imageVector = if (passwordVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                                    contentDescription = if (passwordVisible) "Sembunyikan password" else "Tampilkan password",
+                                    tint = Color.Gray
+                                )
+                            }
+                        },
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,

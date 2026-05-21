@@ -797,6 +797,8 @@ class FarmViewModel : ViewModel() {
                         createdAt = Timestamp.now()
                     )
                     repository.createPenjualan(j)
+                    fetchHewanSilsilah(hewan.silsilahId)
+                    fetchRiwayatPenjualan(pengurusId, "Pengurus")
                 }
                 onSuccess(isDirect)
             } catch (e: Exception) {
@@ -856,13 +858,18 @@ class FarmViewModel : ViewModel() {
                     
                     // Logic Pembagian berdasarkan ownershipSource
                     val isPengurusOwned = hewan.ownershipSource.contains("PENGURUS", ignoreCase = true)
+                    val isPemilikOwned = hewan.ownershipSource.equals("PEMILIK", ignoreCase = true)
                     
                     if (isPengurusOwned) {
                         // Just in case a PENGURUS animal enters pending (though UI should prevent it)
                         ownerAdd = 0
                         pengurusAdd = penjualan.hargaJual
+                    } else if (isPemilikOwned) {
+                        // Full milik Pemilik - 100% ke Pemilik
+                        ownerAdd = penjualan.hargaJual
+                        pengurusAdd = 0
                     } else {
-                        // Logic Titipan (BAGI_DUA atau PEMILIK)
+                        // Logic Titipan (BAGI_DUA) - Bagi hasil 50/50
                         if (profit > 0) {
                             val profitShare = profit / 2
                             ownerAdd = penjualan.hargaModal + profitShare

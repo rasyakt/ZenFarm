@@ -27,6 +27,7 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Pets
 import androidx.compose.material.icons.rounded.ShoppingCart
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,12 +38,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavController
 import com.example.zenfarm.viewmodel.FarmViewModel
+import com.example.zenfarm.ui.theme.standardTextFieldColors
+import com.example.zenfarm.ui.theme.CardWhite
+import com.example.zenfarm.ui.theme.TextSecondary
+import com.example.zenfarm.ui.theme.FarmGreen
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 
@@ -136,35 +142,37 @@ fun TambahJantanScreen(
                         )
                         options.forEach { (label, icon, color) ->
                             val isSelected = if (label == "Baru") selectedPejantanId == null else selectedPejantanId != null
+                            val isEmptyAmbil = (label == "Ambil" && availablePejantans.isEmpty())
                             Card(
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(56.dp)
-                                    .clickable { 
-                                        if (!isLoading) {
-                                            if (label == "Ambil" && availablePejantans.isNotEmpty()) {
-                                                selectedPejantanId = availablePejantans.first().hewanId
-                                                nama = availablePejantans.first().nama
-                                            } else {
-                                                selectedPejantanId = null
-                                                nama = ""
-                                            }
+                                    .clickable {
+                                        if (isLoading) return@clickable
+                                        if (label == "Ambil" && availablePejantans.isNotEmpty()) {
+                                            selectedPejantanId = availablePejantans.first().hewanId
+                                            nama = availablePejantans.first().nama
+                                        } else if (label == "Ambil" && availablePejantans.isEmpty()) {
+                                            scope.launch { snackbarHostState.showSnackbar("Tidak ada pejantan yang tersedia") }
+                                        } else {
+                                            selectedPejantanId = null
+                                            nama = ""
                                         }
                                     },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = if (isSelected) color.copy(alpha = 0.1f) else Color.White
+                                    containerColor = if (isSelected) color.copy(alpha = 0.1f) else if (isEmptyAmbil) Color(0xFFF8FAFC) else Color.White
                                 ),
-                                border = BorderStroke(1.5.dp, if (isSelected) color else Color(0xFFE2E8F0))
+                                border = BorderStroke(1.5.dp, if (isSelected) color else if (isEmptyAmbil) Color(0xFFE2E8F0) else Color(0xFFE2E8F0))
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Center
                                 ) {
-                                    Icon(icon, contentDescription = null, tint = if (isSelected) color else Color.Gray, modifier = Modifier.size(20.dp))
+                                    Icon(icon, contentDescription = null, tint = if (isEmptyAmbil) Color(0xFFCBD5E1) else if (isSelected) color else Color.Gray, modifier = Modifier.size(20.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Text(label, color = if (isSelected) color else Color.Black, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
+                                    Text(label, color = if (isEmptyAmbil) Color(0xFF94A3B8) else if (isSelected) color else Color.Black, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
                                 }
                             }
                         }
@@ -182,13 +190,13 @@ fun TambahJantanScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.Rounded.Person, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Gray)
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(sel?.nama ?: "Pilih Pejantan")
+                                    Text(sel?.nama ?: "Pilih Pejantan", maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 }
                             }
                             DropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }, modifier = Modifier.fillMaxWidth(0.9f)) {
                                 DropdownMenuItem(text = { Text("Input Pejantan Baru") }, onClick = { selectedPejantanId = null; dropdownExpanded = false })
                                 availablePejantans.forEach { p ->
-                                    DropdownMenuItem(text = { Text(p.nama) }, onClick = { 
+                                    DropdownMenuItem(text = { Text(p.nama, maxLines = 1, overflow = TextOverflow.Ellipsis) }, onClick = { 
                                         selectedPejantanId = p.hewanId
                                         nama = p.nama
                                         dropdownExpanded = false
@@ -213,24 +221,26 @@ fun TambahJantanScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     if (selectedPejantanId == null) {
-                        OutlinedTextField(
-                            value = nama,
-                            onValueChange = { nama = it },
-                            label = { Text("Nama Pejantan Baru") },
-                            leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        OutlinedTextField(
-                            value = harga,
-                            onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
-                            label = { Text("Harga Modal (Rp)") },
-                            leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
-                            modifier = Modifier.fillMaxWidth(),
-                            enabled = !isLoading,
-                            shape = RoundedCornerShape(12.dp)
-                        )
+                         OutlinedTextField(
+                             value = nama,
+                             onValueChange = { nama = it },
+                             label = { Text("Nama Pejantan Baru") },
+                             leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                             modifier = Modifier.fillMaxWidth(),
+                             enabled = !isLoading,
+                             shape = RoundedCornerShape(12.dp),
+                             colors = standardTextFieldColors()
+                         )
+                         OutlinedTextField(
+                             value = harga,
+                             onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
+                             label = { Text("Harga Modal (Rp)") },
+                             leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
+                             modifier = Modifier.fillMaxWidth(),
+                             enabled = !isLoading,
+                             shape = RoundedCornerShape(12.dp),
+                             colors = standardTextFieldColors()
+                         )
                     } else {
                         val sel = availablePejantans.find { it.hewanId == selectedPejantanId }
                         DetailCardRow(Icons.Rounded.Person, "Nama", sel?.nama ?: "-", Color(0xFF1976D2))
@@ -241,13 +251,19 @@ fun TambahJantanScreen(
                         Text("Hak Pembagian", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             listOf("Pemilik", "Pengurus", "Bagi Dua").forEach { option ->
-                                FilterChip(
-                                    selected = hakPembagian == option,
-                                    onClick = { hakPembagian = option },
-                                    label = { Text(option) },
-                                    enabled = !isLoading,
-                                    shape = RoundedCornerShape(8.dp)
-                                )
+                                 FilterChip(
+                                     selected = hakPembagian == option,
+                                     onClick = { hakPembagian = option },
+                                     label = { Text(option) },
+                                     enabled = !isLoading,
+                                     shape = RoundedCornerShape(8.dp),
+                                     colors = FilterChipDefaults.filterChipColors(
+                                         containerColor = CardWhite,
+                                         labelColor = TextSecondary,
+                                         selectedContainerColor = FarmGreen,
+                                         selectedLabelColor = Color.White
+                                     )
+                                 )
                             }
                         }
                     }
@@ -337,7 +353,7 @@ fun TambahJantanScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                enabled = !isLoading,
+                enabled = !isLoading && ((selectedPejantanId == null && nama.isNotBlank()) || selectedPejantanId != null),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF2E7D32),
@@ -445,7 +461,7 @@ fun TambahJantanDialog(
                             Text("Tambah Pasangan", fontWeight = FontWeight.Bold, color = Color.White, style = MaterialTheme.typography.titleMedium)
                         }
                         IconButton(onClick = onDismiss) {
-                            Icon(Icons.Rounded.CheckCircle, contentDescription = "Tutup", tint = Color.White.copy(alpha = 0.8f))
+                            Icon(Icons.Rounded.Close, contentDescription = "Tutup", tint = Color.White.copy(alpha = 0.8f))
                         }
                     }
                 }
@@ -474,35 +490,37 @@ fun TambahJantanDialog(
                                 )
                                 options.forEach { (label, icon, color) ->
                                     val isSelected = if (label == "Baru") selectedPejantanId == null else selectedPejantanId != null
+                                    val isEmptyAmbil = (label == "Ambil" && availablePejantans.isEmpty())
                                     Card(
                                         modifier = Modifier
                                             .weight(1f)
                                             .height(52.dp)
                                             .clickable {
-                                                if (!isLoading) {
-                                                    if (label == "Ambil" && availablePejantans.isNotEmpty()) {
-                                                        selectedPejantanId = availablePejantans.first().hewanId
-                                                        nama = availablePejantans.first().nama
-                                                    } else {
-                                                        selectedPejantanId = null
-                                                        nama = ""
-                                                    }
+                                                if (isLoading) return@clickable
+                                                if (label == "Ambil" && availablePejantans.isNotEmpty()) {
+                                                    selectedPejantanId = availablePejantans.first().hewanId
+                                                    nama = availablePejantans.first().nama
+                                                } else if (label == "Ambil" && availablePejantans.isEmpty()) {
+                                                    scope.launch { snackbarHostState.showSnackbar("Tidak ada pejantan yang tersedia") }
+                                                } else {
+                                                    selectedPejantanId = null
+                                                    nama = ""
                                                 }
                                             },
                                         shape = RoundedCornerShape(12.dp),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = if (isSelected) color.copy(alpha = 0.1f) else Color.White
+                                            containerColor = if (isSelected) color.copy(alpha = 0.1f) else if (isEmptyAmbil) Color(0xFFF8FAFC) else Color.White
                                         ),
-                                        border = BorderStroke(1.5.dp, if (isSelected) color else Color(0xFFE2E8F0))
+                                        border = BorderStroke(1.5.dp, if (isSelected) color else if (isEmptyAmbil) Color(0xFFE2E8F0) else Color(0xFFE2E8F0))
                                     ) {
                                         Row(
                                             modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.Center
                                         ) {
-                                            Icon(icon, contentDescription = null, tint = if (isSelected) color else Color.Gray, modifier = Modifier.size(20.dp))
+                                            Icon(icon, contentDescription = null, tint = if (isEmptyAmbil) Color(0xFFCBD5E1) else if (isSelected) color else Color.Gray, modifier = Modifier.size(20.dp))
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text(label, color = if (isSelected) color else Color.Black, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
+                                            Text(label, color = if (isEmptyAmbil) Color(0xFF94A3B8) else if (isSelected) color else Color.Black, fontSize = 12.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
                                         }
                                     }
                                 }
@@ -520,13 +538,13 @@ fun TambahJantanDialog(
                                         Row(verticalAlignment = Alignment.CenterVertically) {
                                             Icon(Icons.Rounded.Person, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Gray)
                                             Spacer(modifier = Modifier.width(8.dp))
-                                            Text(sel?.nama ?: "Pilih Pejantan")
+                                            Text(sel?.nama ?: "Pilih Pejantan", maxLines = 1, overflow = TextOverflow.Ellipsis)
                                         }
                                     }
                                     DropdownMenu(expanded = dropdownExpanded, onDismissRequest = { dropdownExpanded = false }, modifier = Modifier.fillMaxWidth(0.9f)) {
                                         DropdownMenuItem(text = { Text("Input Pejantan Baru") }, onClick = { selectedPejantanId = null; dropdownExpanded = false })
                                         availablePejantans.forEach { p ->
-                                            DropdownMenuItem(text = { Text(p.nama) }, onClick = { selectedPejantanId = p.hewanId; nama = p.nama; dropdownExpanded = false })
+                                            DropdownMenuItem(text = { Text(p.nama, maxLines = 1, overflow = TextOverflow.Ellipsis) }, onClick = { selectedPejantanId = p.hewanId; nama = p.nama; dropdownExpanded = false })
                                         }
                                     }
                                 }
@@ -548,24 +566,26 @@ fun TambahJantanDialog(
                     ) {
                         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             if (selectedPejantanId == null) {
-                                OutlinedTextField(
-                                    value = nama,
-                                    onValueChange = { nama = it },
-                                    label = { Text("Nama Pejantan Baru") },
-                                    leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    enabled = !isLoading,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
-                                OutlinedTextField(
-                                    value = harga,
-                                    onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
-                                    label = { Text("Harga Modal (Rp)") },
-                                    leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    enabled = !isLoading,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
+                                 OutlinedTextField(
+                                     value = nama,
+                                     onValueChange = { nama = it },
+                                     label = { Text("Nama Pejantan Baru") },
+                                     leadingIcon = { Icon(Icons.Rounded.Person, contentDescription = null) },
+                                     modifier = Modifier.fillMaxWidth(),
+                                     enabled = !isLoading,
+                                     shape = RoundedCornerShape(12.dp),
+                                     colors = standardTextFieldColors()
+                                 )
+                                 OutlinedTextField(
+                                     value = harga,
+                                     onValueChange = { if (it.all { char -> char.isDigit() }) harga = it },
+                                     label = { Text("Harga Modal (Rp)") },
+                                     leadingIcon = { Icon(Icons.Rounded.ShoppingCart, contentDescription = null) },
+                                     modifier = Modifier.fillMaxWidth(),
+                                     enabled = !isLoading,
+                                     shape = RoundedCornerShape(12.dp),
+                                     colors = standardTextFieldColors()
+                                 )
                             } else {
                                 val sel = availablePejantans.find { it.hewanId == selectedPejantanId }
                                 DetailCardRow(Icons.Rounded.Person, "Nama", sel?.nama ?: "-", Color(0xFF1976D2))
@@ -576,13 +596,19 @@ fun TambahJantanDialog(
                                 Text("Hak Pembagian", style = MaterialTheme.typography.labelMedium, color = Color.Gray, modifier = Modifier.padding(bottom = 8.dp))
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     listOf("Pemilik", "Pengurus", "Bagi Dua").forEach { option ->
-                                        FilterChip(
-                                            selected = hakPembagian == option,
-                                            onClick = { hakPembagian = option },
-                                            label = { Text(option) },
-                                            enabled = !isLoading,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )
+                                         FilterChip(
+                                             selected = hakPembagian == option,
+                                             onClick = { hakPembagian = option },
+                                             label = { Text(option) },
+                                             enabled = !isLoading,
+                                             shape = RoundedCornerShape(8.dp),
+                                             colors = FilterChipDefaults.filterChipColors(
+                                                 containerColor = CardWhite,
+                                                 labelColor = TextSecondary,
+                                                 selectedContainerColor = FarmGreen,
+                                                 selectedLabelColor = Color.White
+                                             )
+                                         )
                                     }
                                 }
                             }
@@ -666,7 +692,7 @@ fun TambahJantanDialog(
                             )
                         },
                         modifier = Modifier.fillMaxWidth().height(52.dp),
-                        enabled = !isLoading,
+                        enabled = !isLoading && ((selectedPejantanId == null && nama.isNotBlank()) || selectedPejantanId != null),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2), contentColor = Color.White),
                         elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
@@ -720,9 +746,9 @@ private fun DetailCardRow(
             )
         }
         Spacer(modifier = Modifier.width(12.dp))
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             Text(label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B))
+            Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = Color(0xFF1E293B), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
